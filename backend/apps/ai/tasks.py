@@ -50,7 +50,9 @@ def generate_quiz_task(self, quiz_id, topic, num_questions, difficulty):
                 )
 
         quiz.generation_status = "completed"
-        quiz.save(update_fields=["generation_status"])
+        if quiz.time_limit_seconds is None:
+            quiz.time_limit_seconds = num_questions * 60
+        quiz.save(update_fields=["generation_status", "time_limit_seconds"])
         return {"quiz_id": str(quiz_id), "questions_created": len(result.questions)}
 
     except Exception as exc:

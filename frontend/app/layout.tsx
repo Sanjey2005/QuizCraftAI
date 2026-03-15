@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/lib/providers";
-import { CustomCursor } from "@/components/ui/custom-cursor";
-import { PageTransition } from "@/components/ui/page-transition";
+import { AppShell } from "@/components/layout/AppShell";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -29,10 +28,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`} suppressHydrationWarning>
         <Providers>
-          <CustomCursor />
-          <PageTransition>
+          <AppShell>
             {children}
-          </PageTransition>
+          </AppShell>
         </Providers>
       </body>
     </html>

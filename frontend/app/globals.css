@@ -136,11 +136,18 @@
 }
 
 @layer base {
-  * {
+  *, *::before, *::after {
     @apply border-border outline-ring/50;
   }
+  
+  body.custom-cursor-active,
+  body.custom-cursor-active *,
+  body.custom-cursor-active *::before,
+  body.custom-cursor-active *::after {
+    cursor: none !important;
+  }
   body {
-    @apply bg-background text-foreground cursor-none;
+    @apply bg-background text-foreground;
   }
   html {
     @apply font-sans;

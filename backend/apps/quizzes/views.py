@@ -1,13 +1,18 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
-from .models import Quiz
+from django.db import models
+from .models import Quiz, Question, Choice
 from .serializers import (
     QuizSerializer,
     QuizGenerateSerializer,
     QuizStatusSerializer,
+    QuestionEditSerializer,
 )
 from apps.ai.tasks import generate_quiz_task
+from apps.ai.providers import call_nim
 
 
 class IsInstructor(permissions.BasePermission):
@@ -29,7 +34,14 @@ class QuizListCreateView(generics.ListCreateAPIView):
         if mine and self.request.user.is_authenticated and self.request.user.role == "instructor":
             qs = Quiz.objects.filter(creator=self.request.user).order_by("-created_at")
         else:
-            qs = Quiz.objects.filter(is_published=True)
+            now = timezone.now()
+            qs = Quiz.objects.filter(
+                is_published=True,
+            ).filter(
+                models.Q(available_from__isnull=True) | models.Q(available_from__lte=now)
+            ).filter(
+                models.Q(available_until__isnull=True) | models.Q(available_until__gte=now)
+            )
         topic = self.request.query_params.get("topic")
         difficulty = self.request.query_params.get("difficulty")
         if topic:
@@ -102,3 +114,42 @@ class QuizStatusView(generics.RetrieveAPIView):
     serializer_class = QuizStatusSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = Quiz.objects.all()
+
+
+class QuizQuestionsEditView(generics.ListAPIView):
+    serializer_class = QuestionEditSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        quiz = get_object_or_404(Quiz, pk=self.kwargs["pk"])
+        if quiz.creator != self.request.user:
+            self.permission_denied(self.request)
+        return quiz.questions.prefetch_related("choices").all()
+
+
+class RegenerateQuestionView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk, question_id):
+        quiz = get_object_or_404(Quiz, pk=pk)
+        if quiz.creator != request.user:
+            return Response({"detail": "Not allowed."}, status=status.HTTP_403_FORBIDDEN)
+        question = get_object_or_404(Question, pk=question_id, quiz=quiz)
+
+        try:
+            result = call_nim(quiz.topic, 1, quiz.difficulty)
+        except Exception:
+            return Response({"detail": "AI generation failed."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        q_data = result.questions[0]
+        question.text = q_data.question_text
+        question.explanation = q_data.explanation
+        question.topic_tag = q_data.topic_tag
+        question.difficulty_score = q_data.difficulty_score
+        question.save()
+
+        question.choices.all().delete()
+        for i, c in enumerate(q_data.choices):
+            Choice.objects.create(question=question, text=c.text, is_correct=c.is_correct, order=i)
+
+        return Response(QuestionEditSerializer(question).data)

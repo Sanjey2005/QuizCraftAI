@@ -42,6 +42,8 @@ class Quiz(models.Model):
         choices=GENERATION_STATUS_CHOICES,
         default="completed",
     )
+    available_from = models.DateTimeField(null=True, blank=True)
+    available_until = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

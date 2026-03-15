@@ -3,481 +3,284 @@
 import { use, useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  Save,
-  Eye,
-  CheckCircle2,
-  Loader2,
-  BookOpen,
-  Clock,
-  Users,
-  Shuffle,
-  Timer,
-  Globe,
-  Lock,
-} from "lucide-react";
+import { ArrowLeft, Save, Eye, CheckCircle2, Loader2, BookOpen, Clock, Users, Globe, Lock, RefreshCw, CheckCircle, XCircle } from "lucide-react";
 import { api } from "@/lib/api";
+import { PageWrapper } from "@/components/layout/PageWrapper";
 
 interface Quiz {
-  id: string;
-  title: string;
-  description: string;
-  topic: string;
-  difficulty: string;
-  is_published: boolean;
-  time_limit_seconds: number | null;
-  per_question_timer: boolean;
-  shuffle_questions: boolean;
-  shuffle_options: boolean;
-  max_attempts: number;
-  generation_status: string;
-  question_count: number;
-  created_at: string;
+  id: string; title: string; description: string; topic: string; difficulty: string;
+  is_published: boolean; time_limit_seconds: number | null; per_question_timer: boolean;
+  shuffle_questions: boolean; shuffle_options: boolean; max_attempts: number;
+  generation_status: string; question_count: number; created_at: string;
+  available_from: string | null; available_until: string | null;
+}
+
+interface Choice {
+  id: string; text: string; is_correct: boolean; order: number;
+}
+
+interface Question {
+  id: string; text: string; explanation: string; order: number;
+  topic_tag: string; difficulty_score: number; choices: Choice[];
 }
 
 interface FormState {
-  title: string;
-  description: string;
-  timeLimitMinutes: string;
-  maxAttempts: string;
-  shuffleQuestions: boolean;
-  shuffleOptions: boolean;
-  perQuestionTimer: boolean;
+  title: string; description: string; timeLimitMinutes: string; maxAttempts: string;
+  shuffleQuestions: boolean; shuffleOptions: boolean; perQuestionTimer: boolean;
+  availableFrom: string; availableUntil: string;
 }
 
-function Toggle({
-  checked,
-  onChange,
-  disabled,
-}: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  disabled?: boolean;
-}) {
+function Toggle({ checked, onChange, disabled }: { checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      disabled={disabled}
+    <button type="button" role="switch" aria-checked={checked} disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
-        checked ? "focus:ring-blue-500" : "focus:ring-slate-400"
-      }`}
-      style={{ background: checked ? "var(--color-accent)" : "#cbd5e1" }}
-    >
-      <span
-        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-          checked ? "translate-x-5" : "translate-x-0"
-        }`}
-      />
+      className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+      style={{ background: checked ? "#2563EB" : "rgba(255,255,255,0.12)" }}>
+      <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${checked ? "translate-x-5" : "translate-x-0"}`} />
     </button>
   );
 }
 
-function SettingRow({
-  label,
-  description,
-  children,
-}: {
-  label: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
+function SettingRow({ label, description, children }: { label: string; description?: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-6 py-4 border-b border-slate-100 last:border-0">
-      <div className="min-w-0">
-        <p className="text-sm font-medium text-slate-900">{label}</p>
-        {description && (
-          <p className="text-xs text-slate-400 mt-0.5">{description}</p>
-        )}
-      </div>
+    <div className="flex items-center justify-between gap-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+      <div><p className="text-sm font-medium text-white/80">{label}</p>{description && <p className="text-xs text-white/30 mt-0.5">{description}</p>}</div>
       <div className="flex-shrink-0">{children}</div>
     </div>
   );
 }
 
-export default function EditQuizPage({
-  params,
+function QuestionCard({
+  question,
+  index,
+  quizId,
+  onRegenerated,
 }: {
-  params: Promise<{ id: string }>;
+  question: Question;
+  index: number;
+  quizId: string;
+  onRegenerated: (q: Question) => void;
 }) {
+  const regenMutation = useMutation({
+    mutationFn: () =>
+      api.post<Question>(`/api/quizzes/${quizId}/regenerate-question/${question.id}`).then((r) => r.data),
+    onSuccess: onRegenerated,
+  });
+
+  return (
+    <div className="rounded-2xl p-5" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <div className="flex items-start gap-3">
+          <span className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white/50" style={{ background: "rgba(255,255,255,0.06)" }}>
+            {index + 1}
+          </span>
+          <p className="text-sm text-white/85 font-medium leading-relaxed">{question.text}</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => regenMutation.mutate()}
+          disabled={regenMutation.isPending}
+          title="Regenerate this question"
+          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white/40 hover:text-white/70 hover:bg-white/8 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          {regenMutation.isPending ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <RefreshCw className="w-3.5 h-3.5" />
+          )}
+          {regenMutation.isPending ? "Regenerating…" : "Regenerate"}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 gap-2 ml-10">
+        {question.choices.map((choice) => (
+          <div
+            key={choice.id}
+            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm"
+            style={{
+              background: choice.is_correct ? "rgba(22,163,74,0.12)" : "rgba(255,255,255,0.03)",
+              border: choice.is_correct ? "1px solid rgba(22,163,74,0.3)" : "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            {choice.is_correct ? (
+              <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            ) : (
+              <XCircle className="w-4 h-4 text-white/15 flex-shrink-0" />
+            )}
+            <span className={choice.is_correct ? "text-emerald-300 font-medium" : "text-white/50"}>
+              {choice.text}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {regenMutation.isError && (
+        <p className="ml-10 mt-2 text-xs text-rose-400">Failed to regenerate. Try again.</p>
+      )}
+
+      {question.topic_tag && (
+        <div className="ml-10 mt-3">
+          <span className="text-xs text-white/25 font-mono">{question.topic_tag}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function EditQuizPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const queryClient = useQueryClient();
-  const [form, setForm] = useState<FormState>({
-    title: "",
-    description: "",
-    timeLimitMinutes: "",
-    maxAttempts: "0",
-    shuffleQuestions: true,
-    shuffleOptions: true,
-    perQuestionTimer: false,
-  });
+  const [form, setForm] = useState<FormState>({ title: "", description: "", timeLimitMinutes: "", maxAttempts: "0", shuffleQuestions: true, shuffleOptions: true, perQuestionTimer: false, availableFrom: "", availableUntil: "" });
   const [saved, setSaved] = useState(false);
+  const [questions, setQuestions] = useState<Question[]>([]);
 
   const { data: quiz, isLoading, isError } = useQuery<Quiz>({
     queryKey: ["quiz", id],
     queryFn: () => api.get<Quiz>(`/api/quizzes/${id}`).then((r) => r.data),
   });
 
-  // Initialise form once quiz loads
-  useEffect(() => {
-    if (!quiz) return;
-    setForm({
-      title: quiz.title,
-      description: quiz.description || "",
-      timeLimitMinutes: quiz.time_limit_seconds
-        ? String(Math.round(quiz.time_limit_seconds / 60))
-        : "",
-      maxAttempts: String(quiz.max_attempts),
-      shuffleQuestions: quiz.shuffle_questions,
-      shuffleOptions: quiz.shuffle_options,
-      perQuestionTimer: quiz.per_question_timer,
-    });
-  }, [quiz?.id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: ["quiz", id] });
-    queryClient.invalidateQueries({ queryKey: ["my-quizzes"] });
-  };
-
-  // Publish toggle — fires immediately on click
-  const publishMutation = useMutation({
-    mutationFn: (published: boolean) =>
-      api.patch(`/api/quizzes/${id}`, { is_published: published }).then((r) => r.data),
-    onSuccess: invalidate,
+  const { data: fetchedQuestions, isLoading: questionsLoading } = useQuery<Question[]>({
+    queryKey: ["quiz-questions-edit", id],
+    queryFn: () => api.get<Question[]>(`/api/quizzes/${id}/questions`).then((r) => r.data),
+    enabled: !!quiz,
   });
 
-  // Settings save — fires on button click
+  useEffect(() => {
+    if (fetchedQuestions) setQuestions(fetchedQuestions);
+  }, [fetchedQuestions]);
+
+  useEffect(() => {
+    if (!quiz) return;
+    const toLocalDatetimeInput = (iso: string | null) => iso ? new Date(iso).toISOString().slice(0, 16) : "";
+    setForm({ title: quiz.title, description: quiz.description || "", timeLimitMinutes: quiz.time_limit_seconds ? String(Math.round(quiz.time_limit_seconds / 60)) : "", maxAttempts: String(quiz.max_attempts), shuffleQuestions: quiz.shuffle_questions, shuffleOptions: quiz.shuffle_options, perQuestionTimer: quiz.per_question_timer, availableFrom: toLocalDatetimeInput(quiz.available_from), availableUntil: toLocalDatetimeInput(quiz.available_until) });
+  }, [quiz?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const invalidate = () => { queryClient.invalidateQueries({ queryKey: ["quiz", id] }); queryClient.invalidateQueries({ queryKey: ["my-quizzes"] }); };
+  const publishMutation = useMutation({ mutationFn: (p: boolean) => api.patch(`/api/quizzes/${id}`, { is_published: p }).then((r) => r.data), onSuccess: invalidate });
   const settingsMutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) =>
-      api.patch(`/api/quizzes/${id}`, data).then((r) => r.data),
-    onSuccess: () => {
-      invalidate();
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    },
+    mutationFn: (d: Record<string, unknown>) => api.patch(`/api/quizzes/${id}`, d).then((r) => r.data),
+    onSuccess: () => { invalidate(); setSaved(true); setTimeout(() => setSaved(false), 3000); },
   });
 
   const handleSave = () => {
-    const timeLimitSeconds = form.timeLimitMinutes
-      ? parseInt(form.timeLimitMinutes, 10) * 60
-      : null;
-    settingsMutation.mutate({
-      title: form.title,
-      description: form.description,
-      time_limit_seconds: timeLimitSeconds,
-      max_attempts: parseInt(form.maxAttempts, 10) || 0,
-      shuffle_questions: form.shuffleQuestions,
-      shuffle_options: form.shuffleOptions,
-      per_question_timer: form.perQuestionTimer,
-    });
+    settingsMutation.mutate({ title: form.title, description: form.description, time_limit_seconds: form.timeLimitMinutes ? parseInt(form.timeLimitMinutes) * 60 : null, max_attempts: parseInt(form.maxAttempts) || 0, shuffle_questions: form.shuffleQuestions, shuffle_options: form.shuffleOptions, per_question_timer: form.perQuestionTimer, available_from: form.availableFrom ? new Date(form.availableFrom).toISOString() : null, available_until: form.availableUntil ? new Date(form.availableUntil).toISOString() : null });
+  };
+  const set = (key: keyof FormState) => (val: string | boolean) => setForm((f) => ({ ...f, [key]: val }));
+
+  const handleRegenerated = (updated: Question) => {
+    setQuestions((prev) => prev.map((q) => (q.id === updated.id ? updated : q)));
   };
 
-  const set = (key: keyof FormState) => (val: string | boolean) =>
-    setForm((f) => ({ ...f, [key]: val }));
+  const inputClass = "w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/25 outline-none transition-all";
+  const inputStyle = { background: "var(--surface-700)", border: "1px solid rgba(255,255,255,0.08)" };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2
-          className="w-8 h-8 animate-spin"
-          style={{ color: "var(--color-accent)" }}
-        />
-      </div>
-    );
-  }
-
-  if (isError || !quiz) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 font-medium mb-4">Quiz not found.</p>
-          <Link
-            href="/dashboard/instructor"
-            className="text-sm underline"
-            style={{ color: "var(--color-accent)" }}
-          >
-            Back to dashboard
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--surface-900)" }}><Loader2 className="w-8 h-8 animate-spin text-blue-400" /></div>;
+  if (isError || !quiz) return <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--surface-900)" }}><p className="text-rose-400">Quiz not found. <Link href="/dashboard/instructor" className="underline text-blue-400">Back</Link></p></div>;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header
-        className="border-b border-slate-200 px-6 py-4"
-        style={{ background: "var(--color-brand)" }}
-      >
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-white/20 flex items-center justify-center text-white text-xs font-bold">
-              Q
-            </div>
-            <span className="text-white font-semibold">QuizCraft AI</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href={`/quizzes/${id}`}
-              className="flex items-center gap-1.5 text-white/70 hover:text-white text-sm transition-colors"
-            >
-              <Eye className="w-4 h-4" />
-              Preview
-            </Link>
-            <Link
-              href="/dashboard/instructor"
-              className="flex items-center gap-1.5 text-white/70 hover:text-white text-sm transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Dashboard
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-6 py-8 space-y-4">
-        {/* Page title */}
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">Edit Quiz</h1>
-          <p className="text-slate-400 text-sm mt-0.5 truncate">{quiz.title}</p>
+    <div className="min-h-screen" style={{ background: "var(--surface-900)" }}>
+      <PageWrapper className="max-w-2xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <Link href="/dashboard/instructor" className="inline-flex items-center gap-1.5 text-sm text-white/30 hover:text-white/60 transition-colors"><ArrowLeft className="w-4 h-4" /> Dashboard</Link>
+          <Link href={`/quizzes/${id}`} className="inline-flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors"><Eye className="w-4 h-4" /> Preview</Link>
         </div>
 
-        {/* ── PUBLISH CARD ── */}
-        <div
-          className={`rounded-2xl border p-5 transition-colors ${
-            quiz.is_published
-              ? "bg-green-50 border-green-200"
-              : "bg-white border-slate-200"
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  quiz.is_published ? "bg-green-100" : "bg-slate-100"
-                }`}
-              >
-                {quiz.is_published ? (
-                  <Globe className="w-5 h-5 text-green-600" />
-                ) : (
-                  <Lock className="w-5 h-5 text-slate-400" />
-                )}
-              </div>
-              <div>
-                <p className="font-semibold text-slate-900 text-sm">
-                  {quiz.is_published ? "Published" : "Draft"}
-                </p>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {quiz.is_published
-                    ? "Visible to all students in the quiz library"
-                    : "Hidden — only you can see this quiz"}
-                </p>
-              </div>
-            </div>
-            <Toggle
-              checked={quiz.is_published}
-              onChange={(v) => publishMutation.mutate(v)}
-              disabled={publishMutation.isPending}
-            />
-          </div>
-
-          {publishMutation.isPending && (
-            <p className="text-xs text-slate-400 mt-3 flex items-center gap-1">
-              <Loader2 className="w-3 h-3 animate-spin" />
-              Updating…
-            </p>
-          )}
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-white">Edit Quiz</h1>
+          <p className="text-white/30 text-sm mt-0.5 truncate">{quiz.title}</p>
         </div>
 
-        {/* ── QUIZ INFO (read-only context) ── */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5">
-          <h2 className="text-sm font-semibold text-slate-700 mb-4">
-            Quiz Info
-          </h2>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="flex justify-center mb-1">
-                <BookOpen className="w-4 h-4 text-slate-400" />
-              </div>
-              <p className="text-xl font-bold text-slate-900">
-                {quiz.question_count ?? "—"}
-              </p>
-              <p className="text-xs text-slate-400">Questions</p>
-            </div>
-            <div>
-              <div className="flex justify-center mb-1">
-                <Clock className="w-4 h-4 text-slate-400" />
-              </div>
-              <p className="text-xl font-bold text-slate-900 capitalize">
-                {quiz.difficulty}
-              </p>
-              <p className="text-xs text-slate-400">Difficulty</p>
-            </div>
-            <div>
-              <div className="flex justify-center mb-1">
-                <Users className="w-4 h-4 text-slate-400" />
-              </div>
-              <p className="text-xl font-bold text-slate-900">
-                {quiz.max_attempts === 0 ? "∞" : quiz.max_attempts}
-              </p>
-              <p className="text-xs text-slate-400">Max Attempts</p>
-            </div>
-          </div>
-        </div>
-
-        {/* ── SETTINGS FORM ── */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5">
-          <h2 className="text-sm font-semibold text-slate-700 mb-5">
-            Settings
-          </h2>
-          <div className="space-y-5">
-            {/* Title */}
-            <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1.5">
-                Title
-              </label>
-              <input
-                type="text"
-                value={form.title}
-                onChange={(e) => set("title")(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:border-transparent"
-                style={{ ["--tw-ring-color" as string]: "var(--color-accent)" }}
-                placeholder="Quiz title"
-              />
-            </div>
-
-            {/* Description */}
-            <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1.5">
-                Description{" "}
-                <span className="text-slate-400 font-normal">(optional)</span>
-              </label>
-              <textarea
-                value={form.description}
-                onChange={(e) => set("description")(e.target.value)}
-                rows={3}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:border-transparent resize-none"
-                placeholder="What will students learn from this quiz?"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {/* Time Limit */}
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1.5">
-                  Time Limit{" "}
-                  <span className="text-slate-400 font-normal">(minutes)</span>
-                </label>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="number"
-                    min="1"
-                    max="180"
-                    value={form.timeLimitMinutes}
-                    onChange={(e) => set("timeLimitMinutes")(e.target.value)}
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-lg border border-slate-200 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:border-transparent"
-                    placeholder="No limit"
-                  />
+        <div className="space-y-4">
+          {/* Publish */}
+          <div className={`rounded-2xl border p-5 transition-colors ${quiz.is_published ? "bg-emerald-500/10 border-emerald-500/20" : "border-white/8"}`} style={quiz.is_published ? {} : { background: "var(--surface-800)" }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${quiz.is_published ? "bg-emerald-500/20" : "bg-white/5"}`}>
+                  {quiz.is_published ? <Globe className="w-5 h-5 text-emerald-400" /> : <Lock className="w-5 h-5 text-white/30" />}
+                </div>
+                <div>
+                  <p className="font-semibold text-white text-sm">{quiz.is_published ? "Published" : "Draft"}</p>
+                  <p className="text-xs text-white/35 mt-0.5">{quiz.is_published ? "Visible to all students" : "Hidden — only you can see this"}</p>
                 </div>
               </div>
+              <Toggle checked={quiz.is_published} onChange={(v) => publishMutation.mutate(v)} disabled={publishMutation.isPending} />
+            </div>
+          </div>
 
-              {/* Max Attempts */}
-              <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1.5">
-                  Max Attempts{" "}
-                  <span className="text-slate-400 font-normal">(0 = ∞)</span>
-                </label>
-                <div className="relative">
-                  <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.maxAttempts}
-                    onChange={(e) => set("maxAttempts")(e.target.value)}
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-lg border border-slate-200 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:border-transparent"
-                    placeholder="0"
-                  />
-                </div>
+          {/* Info */}
+          <div className="rounded-2xl p-5" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <h2 className="text-sm font-semibold text-white/60 mb-4">Quiz Info</h2>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              {[{ icon: BookOpen, value: quiz.question_count ?? "—", label: "Questions" }, { icon: Clock, value: quiz.difficulty, label: "Difficulty", cap: true }, { icon: Users, value: quiz.max_attempts === 0 ? "∞" : quiz.max_attempts, label: "Max Attempts" }].map(({ icon: Icon, value, label, cap }) => (
+                <div key={label}><Icon className="w-4 h-4 text-white/25 mx-auto mb-1" /><p className={`text-xl font-bold text-white ${cap ? "capitalize" : ""}`}>{value}</p><p className="text-xs text-white/30">{label}</p></div>
+              ))}
+            </div>
+          </div>
+
+          {/* Settings */}
+          <div className="rounded-2xl p-6" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <h2 className="text-sm font-semibold text-white/60 mb-5">Settings</h2>
+            <div className="space-y-4">
+              <div><label className="block text-xs font-medium text-white/40 mb-1.5">Title</label><input type="text" value={form.title} onChange={(e) => set("title")(e.target.value)} className={inputClass} style={inputStyle} placeholder="Quiz title" onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
+              <div><label className="block text-xs font-medium text-white/40 mb-1.5">Description <span className="text-white/20">(optional)</span></label><textarea value={form.description} onChange={(e) => set("description")(e.target.value)} rows={3} className={inputClass + " resize-none"} style={inputStyle} placeholder="What will students learn?" onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="block text-xs font-medium text-white/40 mb-1.5">Time Limit (min)</label><input type="number" min="1" max="180" value={form.timeLimitMinutes} onChange={(e) => set("timeLimitMinutes")(e.target.value)} className={inputClass} style={inputStyle} placeholder="No limit" onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
+                <div><label className="block text-xs font-medium text-white/40 mb-1.5">Max Attempts (0 = ∞)</label><input type="number" min="0" value={form.maxAttempts} onChange={(e) => set("maxAttempts")(e.target.value)} className={inputClass} style={inputStyle} onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="block text-xs font-medium text-white/40 mb-1.5">Available From <span className="text-white/20">(optional)</span></label><input type="datetime-local" value={form.availableFrom} onChange={(e) => set("availableFrom")(e.target.value)} className={inputClass} style={{ ...inputStyle, colorScheme: "dark" }} onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
+                <div><label className="block text-xs font-medium text-white/40 mb-1.5">Available Until <span className="text-white/20">(optional)</span></label><input type="datetime-local" value={form.availableUntil} onChange={(e) => set("availableUntil")(e.target.value)} className={inputClass} style={{ ...inputStyle, colorScheme: "dark" }} onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* ── QUIZ OPTIONS ── */}
-        <div className="bg-white rounded-2xl border border-slate-200 px-5">
-          <h2 className="text-sm font-semibold text-slate-700 py-4 border-b border-slate-100">
-            Options
-          </h2>
-          <SettingRow
-            label="Shuffle Questions"
-            description="Randomise question order for each attempt"
-          >
-            <Toggle
-              checked={form.shuffleQuestions}
-              onChange={set("shuffleQuestions") as (v: boolean) => void}
-            />
-          </SettingRow>
-          <SettingRow
-            label="Shuffle Answer Options"
-            description="Randomise the order of answer choices"
-          >
-            <Toggle
-              checked={form.shuffleOptions}
-              onChange={set("shuffleOptions") as (v: boolean) => void}
-            />
-          </SettingRow>
-          <SettingRow
-            label="Per-Question Timer"
-            description="Each question gets its own countdown"
-          >
-            <Toggle
-              checked={form.perQuestionTimer}
-              onChange={set("perQuestionTimer") as (v: boolean) => void}
-            />
-          </SettingRow>
-        </div>
+          {/* Options */}
+          <div className="rounded-2xl px-6 pt-2 pb-2" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <h2 className="text-sm font-semibold text-white/60 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>Options</h2>
+            <SettingRow label="Shuffle Questions" description="Randomise question order for each attempt"><Toggle checked={form.shuffleQuestions} onChange={set("shuffleQuestions") as (v: boolean) => void} /></SettingRow>
+            <SettingRow label="Shuffle Answer Options" description="Randomise the order of answer choices"><Toggle checked={form.shuffleOptions} onChange={set("shuffleOptions") as (v: boolean) => void} /></SettingRow>
+            <SettingRow label="Per-Question Timer" description="Each question gets its own countdown"><Toggle checked={form.perQuestionTimer} onChange={set("perQuestionTimer") as (v: boolean) => void} /></SettingRow>
+          </div>
 
-        {/* ── SAVE BUTTON ── */}
-        <div className="flex items-center gap-3 pb-8">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={settingsMutation.isPending}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-60"
-            style={{ background: "var(--color-accent)" }}
-          >
-            {settingsMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Saving…
-              </>
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={handleSave} disabled={settingsMutation.isPending} className="btn-primary disabled:opacity-60">
+              {settingsMutation.isPending ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : <><Save className="w-4 h-4" /> Save Settings</>}
+            </button>
+            {saved && <span className="flex items-center gap-1.5 text-sm text-emerald-400 font-medium"><CheckCircle2 className="w-4 h-4" /> Saved!</span>}
+            {settingsMutation.isError && <span className="text-sm text-rose-400">Failed to save.</span>}
+          </div>
+
+          {/* Question Preview */}
+          <div className="pt-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-semibold text-white/60">
+                Questions
+                {questions.length > 0 && <span className="ml-2 text-white/25 font-normal">({questions.length})</span>}
+              </h2>
+              <p className="text-xs text-white/25">Correct answers highlighted green</p>
+            </div>
+
+            {questionsLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 animate-spin text-white/30" />
+              </div>
+            ) : questions.length === 0 ? (
+              <div className="rounded-2xl p-8 text-center" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <p className="text-white/30 text-sm">No questions yet.</p>
+              </div>
             ) : (
-              <>
-                <Save className="w-4 h-4" />
-                Save Settings
-              </>
+              <div className="space-y-3">
+                {questions.map((q, i) => (
+                  <QuestionCard key={q.id} question={q} index={i} quizId={id} onRegenerated={handleRegenerated} />
+                ))}
+              </div>
             )}
-          </button>
+          </div>
 
-          {saved && (
-            <span className="flex items-center gap-1.5 text-sm text-green-600 font-medium">
-              <CheckCircle2 className="w-4 h-4" />
-              Saved!
-            </span>
-          )}
-
-          {settingsMutation.isError && (
-            <span className="text-sm text-red-600">
-              Failed to save. Please try again.
-            </span>
-          )}
+          <div className="pb-12" />
         </div>
-      </main>
+      </PageWrapper>
     </div>
   );
 }

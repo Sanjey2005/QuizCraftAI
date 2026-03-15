@@ -145,14 +145,30 @@ class QuizGenerationResponse(BaseModel):
 - P4 ✅ Analytics backend + Leaderboard + Student Dashboard + Landing Page + Quiz Editor
 - P5 🔲 Vercel + Railway deployment
 
-## Current Status — Verified Built
+## Current Status
+All core features complete:
+- Full backend API working
+- Consistent UI across all pages
+- Timer fixed, leaderboard fixed, analytics fixed
+- Publish/unpublish working
+- Question preview + per-question regenerate working
+- Quiz availability window (available_from, available_until) working
+
+Remaining for next session:
+- PDF/DOCX upload as AI source
+- UX polish (toasts, empty states, loading states)
+- Final end-to-end test
+- Deploy to Vercel + Railway
+
+## Verified Built
 
 ### Backend
 | File | Contents |
 |------|----------|
 | backend/apps/users/views.py | JWT register, login, token refresh |
-| backend/apps/quizzes/views.py | Quiz CRUD + generate + status poll |
-| backend/apps/quizzes/serializers.py | QuizSerializer with question_count field |
+| backend/apps/quizzes/views.py | Quiz CRUD + generate + status poll + questions-edit + regenerate-question |
+| backend/apps/quizzes/serializers.py | QuizSerializer, QuestionEditSerializer, ChoiceEditSerializer |
+| backend/apps/quizzes/models.py | Quiz with available_from, available_until fields |
 | backend/apps/attempts/services.py | start_attempt, submit_answer, complete_attempt |
 | backend/apps/attempts/views.py | All 6 attempt views |
 | backend/apps/analytics/services.py | get_student_analytics, get_quiz_analytics, get_leaderboard |
@@ -161,26 +177,30 @@ class QuizGenerationResponse(BaseModel):
 | backend/apps/analytics/urls.py | 3 routes under api/analytics/ |
 | backend/config/urls.py | All 4 app URL includes wired |
 | backend/apps/ai/providers.py | call_nim() using Llama 3.1 + json_object format |
-| backend/apps/ai/tasks.py | Celery generate_quiz_task with retry/backoff |
+| backend/apps/ai/tasks.py | Celery generate_quiz_task with retry/backoff + default time_limit |
+
+### Quiz API Additions
+- GET  /api/quizzes/{id}/questions — instructor-only, returns questions + choices with is_correct
+- POST /api/quizzes/{id}/regenerate-question/{question_id} — replaces single question via AI
 
 ### Frontend Pages
 | Route | File | Status |
 |-------|------|--------|
-| / | app/page.tsx | ✅ Premium landing page — hero, 6 feature cards, how-it-works, CTA |
+| / | app/page.tsx | ✅ Premium landing page |
 | /login | app/(auth)/login/page.tsx | ✅ JWT login form |
 | /register | app/(auth)/register/page.tsx | ✅ Role-select registration |
 | /quizzes | app/quizzes/page.tsx | ✅ Browse + filter published quizzes |
-| /quizzes/generate | app/quizzes/generate/page.tsx | ✅ AI form + GenerationStatus polling |
+| /quizzes/generate | app/quizzes/generate/page.tsx | ✅ AI form + polling → redirects to edit on complete |
 | /quizzes/[id] | app/quizzes/[id]/page.tsx | ✅ Quiz detail + Start CTA |
-| /quizzes/[id]/attempt | app/quizzes/[id]/attempt/page.tsx | ✅ Full take-quiz UI with timers |
-| /quizzes/[id]/edit | app/quizzes/[id]/edit/page.tsx | ✅ Publish toggle + settings form |
+| /quizzes/[id]/attempt | app/quizzes/[id]/attempt/page.tsx | ✅ Full take-quiz UI with timers + auto-submit |
+| /quizzes/[id]/edit | app/quizzes/[id]/edit/page.tsx | ✅ Settings + question preview + per-question regenerate + availability window |
 | /attempts/[id]/results | app/attempts/[id]/results/page.tsx | ✅ Score + topic chart + review |
 | /dashboard/student | app/dashboard/student/page.tsx | ✅ Stats cards + topic bars + recent attempts |
-| /dashboard/instructor | app/dashboard/instructor/page.tsx | ✅ Quiz list + stats + Generate CTA |
+| /dashboard/instructor | app/dashboard/instructor/page.tsx | ✅ Quiz list + availability badges + Generate CTA |
 | /analytics/quiz/[id] | app/analytics/quiz/[id]/page.tsx | ✅ Instructor stats + topic chart |
 | /analytics/quiz/[id]/leaderboard | app/analytics/quiz/[id]/leaderboard/page.tsx | ✅ Gold/silver/bronze podium |
-| /analytics/me | app/analytics/me/page.tsx | 🔲 Stub (3 lines) |
-| /admin/overview | app/admin/overview/page.tsx | 🔲 Stub (3 lines) |
+| /analytics/me | app/analytics/me/page.tsx | ✅ Student analytics with error handling |
+| /admin/overview | app/admin/overview/page.tsx | 🔲 Stub |
 
 ### Frontend Components
 - frontend/components/quiz/TimerBar.tsx
@@ -188,6 +208,9 @@ class QuizGenerationResponse(BaseModel):
 - frontend/components/quiz/GenerationStatus.tsx
 - frontend/components/analytics/ScoreHero.tsx
 - frontend/components/analytics/TopicBreakdownChart.tsx
+- frontend/components/layout/Navbar.tsx
+- frontend/components/layout/PageWrapper.tsx
+- frontend/components/layout/AppShell.tsx (custom cursor + conditional navbar)
 
 ## Hackathon Demo Checklist
 - ✅ Generate a 10-question quiz in < 30 seconds live
@@ -195,3 +218,5 @@ class QuizGenerationResponse(BaseModel):
 - ✅ Display topic-wise analytics breakdown post-attempt
 - ✅ Demonstrate tab-switch count recorded in attempt record
 - ✅ Render instructor leaderboard correctly
+- ✅ Preview questions + regenerate individual questions before publishing
+- ✅ Set quiz availability window (scheduled / expired / always on)

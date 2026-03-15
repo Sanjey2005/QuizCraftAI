@@ -14,10 +14,11 @@ export function CustomCursor() {
   const cursorY = useSpring(0, springConfig);
 
   useEffect(() => {
-    // Check if device supports hover (ignore touch devices)
-    if (window.matchMedia("(hover: none)").matches) return;
+    // Check if device supports hover properly
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     
     setIsVisible(true);
+    document.body.classList.add("custom-cursor-active");
 
     const updateMousePosition = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
@@ -42,6 +43,7 @@ export function CustomCursor() {
     return () => {
       window.removeEventListener("mousemove", updateMousePosition);
       window.removeEventListener("mouseover", handleMouseOver);
+      document.body.classList.remove("custom-cursor-active");
     };
   }, [cursorX, cursorY]);
 
@@ -51,26 +53,33 @@ export function CustomCursor() {
     <>
       {/* The main solid dot */}
       <motion.div
-        className="fixed top-0 left-0 w-3 h-3 rounded-full bg-[var(--color-brand)] pointer-events-none z-[9999] mix-blend-multiply drop-shadow-md"
+        className="fixed top-0 left-0 w-3 h-3 rounded-full pointer-events-none z-[9999]"
+        style={{ 
+          backgroundColor: "#fff", 
+          boxShadow: "0 0 6px rgba(255,255,255,0.8)",
+          mixBlendMode: "difference"
+        }}
         animate={{
           x: mousePosition.x - 6,
           y: mousePosition.y - 6,
-          scale: isHovering ? 0 : 1,
+          scale: isHovering ? 1.4 : 1,
           opacity: 1,
         }}
         transition={{ type: "tween", ease: "backOut", duration: 0.1 }}
       />
-      
+
       {/* The trailing hollow circle that expands on hover */}
       <motion.div
-        className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-[var(--color-accent)] pointer-events-none z-[9998]"
+        className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 pointer-events-none z-[9998]"
         style={{
           x: cursorX,
           y: cursorY,
+          borderColor: isHovering ? "#2563eb" : "rgba(255,255,255,0.8)",
+          mixBlendMode: "difference"
         }}
         animate={{
-          scale: isHovering ? 1.5 : 1,
-          backgroundColor: isHovering ? "rgba(var(--color-accent-rgb), 0.1)" : "transparent",
+          scale: isHovering ? 1.6 : 1,
+          backgroundColor: isHovering ? "rgba(37,99,235,0.1)" : "transparent",
         }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       />

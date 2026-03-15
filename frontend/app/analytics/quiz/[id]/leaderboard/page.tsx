@@ -3,246 +3,92 @@
 import { use } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { Trophy, Clock, ArrowLeft, Loader2, Medal } from "lucide-react";
+import { Clock, ArrowLeft, Loader2, Medal, Trophy } from "lucide-react";
 import { api } from "@/lib/api";
+import { PageWrapper } from "@/components/layout/PageWrapper";
+import { cn } from "@/lib/utils";
 
-interface LeaderboardEntry {
-  rank: number;
-  username: string;
-  display_name: string;
-  score: number;
-  time_spent_seconds: number;
-  completed_at: string;
-}
+interface LeaderboardEntry { rank: number; username: string; display_name: string; score: number; time_spent_seconds: number; completed_at: string; }
+interface LeaderboardData { quiz_id: string; quiz_title: string; leaderboard: LeaderboardEntry[]; }
 
-interface LeaderboardData {
-  quiz_id: string;
-  quiz_title: string;
-  leaderboard: LeaderboardEntry[];
-}
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  if (m === 0) return `${s}s`;
-  return `${m}m ${s}s`;
-}
+const fmt = (s: number) => { const m = Math.floor(s / 60); const sec = s % 60; return m === 0 ? `${sec}s` : `${m}m ${sec}s`; };
 
 const PODIUM = [
-  {
-    bg: "bg-amber-50",
-    border: "border-amber-300",
-    ring: "ring-2 ring-amber-400/60",
-    badge: "bg-amber-400 text-white",
-    score: "text-amber-700",
-    icon: "🥇",
-    label: "gold",
-  },
-  {
-    bg: "bg-slate-50",
-    border: "border-slate-300",
-    ring: "ring-2 ring-slate-400/50",
-    badge: "bg-slate-400 text-white",
-    score: "text-slate-700",
-    icon: "🥈",
-    label: "silver",
-  },
-  {
-    bg: "bg-orange-50",
-    border: "border-orange-300",
-    ring: "ring-2 ring-orange-400/50",
-    badge: "bg-orange-400 text-white",
-    score: "text-orange-700",
-    icon: "🥉",
-    label: "bronze",
-  },
+  { bg: "bg-amber-500/10", border: "border-amber-500/20", text: "text-amber-400" },
+  { bg: "bg-white/5", border: "border-white/10", text: "text-white/50" },
+  { bg: "bg-orange-500/10", border: "border-orange-500/20", text: "text-orange-400" },
 ];
 
-function PodiumCard({ entry }: { entry: LeaderboardEntry }) {
-  const style = PODIUM[entry.rank - 1];
-  return (
-    <div
-      className={`flex flex-col items-center p-5 rounded-2xl border ${style.bg} ${style.border} ${style.ring} transition-shadow hover:shadow-lg`}
-    >
-      <span className="text-3xl mb-2">{style.icon}</span>
-      <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mb-2 ${style.badge}`}
-      >
-        {entry.rank}
-      </div>
-      <p className="font-semibold text-slate-900 text-sm text-center leading-tight">
-        {entry.display_name}
-      </p>
-      <p className="text-xs text-slate-500 mb-3">@{entry.username}</p>
-      <p className={`text-2xl font-bold font-mono tabular-nums ${style.score}`}>
-        {entry.score}
-        <span className="text-base font-semibold">%</span>
-      </p>
-      <div className="flex items-center gap-1 mt-2 text-xs text-slate-400">
-        <Clock className="w-3 h-3" />
-        {formatTime(entry.time_spent_seconds)}
-      </div>
-    </div>
-  );
-}
-
-function LeaderboardRow({ entry }: { entry: LeaderboardEntry }) {
-  return (
-    <div className="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 transition-colors">
-      <span className="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 text-sm font-bold">
-        {entry.rank}
-      </span>
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-slate-900 text-sm truncate">
-          {entry.display_name}
-        </p>
-        <p className="text-xs text-slate-400">@{entry.username}</p>
-      </div>
-      <div className="flex items-center gap-1 text-xs text-slate-400">
-        <Clock className="w-3 h-3" />
-        {formatTime(entry.time_spent_seconds)}
-      </div>
-      <div
-        className="w-16 text-right font-mono font-bold tabular-nums text-sm"
-        style={{ color: "var(--color-accent)" }}
-      >
-        {entry.score}%
-      </div>
-    </div>
-  );
-}
-
-export default function LeaderboardPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function LeaderboardPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-
   const { data, isLoading, isError } = useQuery<LeaderboardData>({
     queryKey: ["leaderboard", id],
-    queryFn: () =>
-      api.get<LeaderboardData>(`/api/analytics/quiz/${id}/leaderboard`).then((r) => r.data),
+    queryFn: () => api.get<LeaderboardData>(`/api/analytics/quiz/${id}/leaderboard`).then((r) => r.data),
     staleTime: 60_000,
   });
 
-  const podium = data?.leaderboard.slice(0, 3) ?? [];
-  const rest = data?.leaderboard.slice(3) ?? [];
-
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header
-        className="border-b border-slate-200 px-6 py-4"
-        style={{ background: "var(--color-brand)" }}
-      >
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-white/20 flex items-center justify-center text-white text-xs font-bold">
-              Q
-            </div>
-            <span className="text-white font-semibold">QuizCraft AI</span>
-          </div>
-          <Link
-            href={`/analytics/quiz/${id}`}
-            className="flex items-center gap-1.5 text-white/70 hover:text-white text-sm transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Analytics
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-screen" style={{ background: "var(--surface-900)" }}>
+      <PageWrapper className="max-w-2xl mx-auto">
+        <Link href={`/analytics/quiz/${id}`} className="inline-flex items-center gap-1.5 text-sm text-white/30 hover:text-white/60 transition-colors mb-6">
+          <ArrowLeft className="w-4 h-4" /> Back to Analytics
+        </Link>
 
-      <main className="max-w-2xl mx-auto px-6 py-8">
-        {isLoading && (
-          <div className="flex items-center justify-center py-24">
-            <Loader2
-              className="w-8 h-8 animate-spin"
-              style={{ color: "var(--color-accent)" }}
-            />
-          </div>
-        )}
-
-        {isError && (
-          <div className="text-center py-24">
-            <p className="text-red-600 font-medium mb-4">
-              Could not load leaderboard.
-            </p>
-            <Link
-              href="/dashboard/instructor"
-              className="text-sm underline"
-              style={{ color: "var(--color-accent)" }}
-            >
-              Back to dashboard
-            </Link>
-          </div>
-        )}
+        {isLoading && <div className="flex justify-center py-24"><Loader2 className="w-8 h-8 animate-spin text-blue-400" /></div>}
+        {isError && <div className="text-center py-24"><p className="text-rose-400 mb-4">Could not load leaderboard.</p><Link href="/dashboard/instructor" className="text-sm text-blue-400 underline">Back</Link></div>}
 
         {data && (
           <>
-            {/* Title block */}
             <div className="text-center mb-8">
-              <div
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium mb-3"
-                style={{ background: "var(--color-accent)", color: "white", opacity: 0.9 }}
-              >
-                <Trophy className="w-4 h-4" />
-                Leaderboard
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-sm font-semibold mb-3">
+                <Trophy className="w-4 h-4" /> Leaderboard
               </div>
-              <h1 className="text-2xl font-bold text-slate-900">{data.quiz_title}</h1>
-              <p className="text-slate-500 text-sm mt-1">
-                Top {data.leaderboard.length} student
-                {data.leaderboard.length !== 1 ? "s" : ""}
-              </p>
+              <h1 className="text-2xl font-bold text-white">{data.quiz_title}</h1>
+              <p className="text-white/35 text-sm mt-1">Top {data.leaderboard.length} student{data.leaderboard.length !== 1 ? "s" : ""}</p>
             </div>
 
             {data.leaderboard.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
-                <Medal className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                <p className="text-slate-500 font-medium">No attempts yet</p>
-                <p className="text-slate-400 text-sm mt-1">
-                  Students who complete this quiz will appear here.
-                </p>
+              <div className="rounded-2xl p-16 text-center" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <Medal className="w-12 h-12 text-white/10 mx-auto mb-4" />
+                <p className="text-white/40 font-medium">No attempts yet</p>
+                <p className="text-white/25 text-sm mt-1">Students who complete this quiz will appear here.</p>
               </div>
             ) : (
               <>
-                {/* Podium — top 3 */}
-                {podium.length > 0 && (
-                  <div
-                    className={`grid gap-4 mb-6 ${
-                      podium.length === 1
-                        ? "grid-cols-1 max-w-xs mx-auto"
-                        : podium.length === 2
-                        ? "grid-cols-2"
-                        : "grid-cols-3"
-                    }`}
-                  >
-                    {podium.map((entry) => (
-                      <PodiumCard key={entry.rank} entry={entry} />
+                <div className={cn("grid gap-4 mb-6", data.leaderboard.length === 1 ? "grid-cols-1 max-w-xs mx-auto" : data.leaderboard.length === 2 ? "grid-cols-2" : "grid-cols-3")}>
+                  {data.leaderboard.slice(0, 3).map((e) => {
+                    const s = PODIUM[e.rank - 1];
+                    return (
+                      <div key={e.rank} className={cn("flex flex-col items-center p-5 rounded-2xl border", s?.bg, s?.border)}>
+                        <Medal className={cn("w-7 h-7 mb-2", s?.text)} />
+                        <p className="font-bold text-white text-sm text-center">{e.display_name}</p>
+                        <p className="text-xs text-white/30 mb-2">@{e.username}</p>
+                        <p className={cn("text-2xl font-black font-mono", s?.text)}>{Math.round(e.score)}%</p>
+                        <p className="text-xs text-white/25 mt-1 flex items-center gap-1"><Clock className="w-3 h-3" />{fmt(e.time_spent_seconds)}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+                {data.leaderboard.length > 3 && (
+                  <div className="rounded-2xl overflow-hidden" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                      <span className="text-sm font-semibold text-white/50">Other Rankings</span>
+                    </div>
+                    {data.leaderboard.slice(3).map((e) => (
+                      <div key={e.rank} className="flex items-center gap-4 px-5 py-3.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                        <span className="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-full bg-white/5 text-white/40 text-sm font-bold">{e.rank}</span>
+                        <div className="flex-1 min-w-0"><p className="font-medium text-white text-sm truncate">{e.display_name}</p><p className="text-xs text-white/30">@{e.username}</p></div>
+                        <p className="text-xs text-white/25 flex items-center gap-1"><Clock className="w-3 h-3" />{fmt(e.time_spent_seconds)}</p>
+                        <p className="w-14 text-right font-mono font-bold text-sm text-blue-400">{Math.round(e.score)}%</p>
+                      </div>
                     ))}
-                  </div>
-                )}
-
-                {/* Ranks 4–10 */}
-                {rest.length > 0 && (
-                  <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                    <div className="px-5 py-3 border-b border-slate-100 flex items-center gap-2">
-                      <span className="text-sm font-semibold text-slate-700">
-                        Other Rankings
-                      </span>
-                    </div>
-                    <div className="divide-y divide-slate-100">
-                      {rest.map((entry) => (
-                        <LeaderboardRow key={entry.rank} entry={entry} />
-                      ))}
-                    </div>
                   </div>
                 )}
               </>
             )}
           </>
         )}
-      </main>
+      </PageWrapper>
     </div>
   );
 }

@@ -194,17 +194,14 @@ export default function LandingPage() {
       {/* ── HERO ── */}
       <section ref={heroRef} className="relative px-6 lg:px-10 pt-20 pb-32 min-h-[calc(100vh-4rem)] flex items-center mesh-bg overflow-hidden">
         {/* Animated blob orbs */}
-        <motion.div style={{ y: blob1Y }} className="absolute -top-40 right-0 w-[700px] h-[700px] rounded-full opacity-25 blur-3xl pointer-events-none"
+        <motion.div style={{ y: blob1Y, background: "radial-gradient(circle, #2563eb, transparent 70%)" }} className="absolute -top-40 right-0 w-[700px] h-[700px] rounded-full opacity-25 blur-3xl pointer-events-none"
           animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 8, repeat: Infinity }}
-          css={{ background: "radial-gradient(circle, #2563eb, transparent 70%)" }}
         />
-        <motion.div style={{ y: blob2Y }} className="absolute -bottom-20 -left-40 w-[500px] h-[500px] rounded-full opacity-20 blur-3xl pointer-events-none"
+        <motion.div style={{ y: blob2Y, background: "radial-gradient(circle, #7c3aed, transparent 70%)" }} className="absolute -bottom-20 -left-40 w-[500px] h-[500px] rounded-full opacity-20 blur-3xl pointer-events-none"
           animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 10, repeat: Infinity, delay: 2 }}
-          css={{ background: "radial-gradient(circle, #7c3aed, transparent 70%)" }}
         />
-        <motion.div style={{ y: blob3Y }} className="absolute top-1/2 left-1/4 w-[300px] h-[300px] rounded-full opacity-15 blur-3xl pointer-events-none"
+        <motion.div style={{ y: blob3Y, background: "radial-gradient(circle, #06b6d4, transparent 70%)" }} className="absolute top-1/2 left-1/4 w-[300px] h-[300px] rounded-full opacity-15 blur-3xl pointer-events-none"
           animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 7, repeat: Infinity, delay: 4 }}
-          css={{ background: "radial-gradient(circle, #06b6d4, transparent 70%)" }}
         />
 
         {/* Dot grid overlay */}
