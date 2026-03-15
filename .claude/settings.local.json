@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd backend:*)",
+      "Bash(cd C:/Users/acer/Desktop/quizcraftai/backend && python manage.py check 2>&1)",
+      "Bash(ls \"C:/Users/acer/Desktop/quizcraftai/frontend/app/\\(auth\\)/\" 2>&1 && ls \"C:/Users/acer/Desktop/quizcraftai/frontend/app/page.tsx\" 2>&1 && cat \"C:/Users/acer/Desktop/quizcraftai/frontend/app/page.tsx\" 2>&1)",
+      "Skill(gsd:progress)",
+      "Bash(cat:*)",
+      "Bash(cd:*)",
+      "Bash(where python:*)",
+      "Bash(docker compose:*)",
+      "Bash(unzip:*)",
+      "Bash(wc:*)",
+      "Bash(curl:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
