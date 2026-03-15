@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
@@ -8,24 +8,25 @@ import { getStoredUser } from "@/lib/hooks";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { cn } from "@/lib/utils";
-
-interface GeneratePayload {
-  topic: string;
-  num_questions: number;
-  difficulty: "easy" | "medium" | "hard";
-}
+import { Upload, X, FileText } from "lucide-react";
 
 interface StatusResponse {
   id: string;
   generation_status: "pending" | "generating" | "completed" | "failed";
 }
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 export default function GenerateQuizPage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [topic, setTopic] = useState("");
   const [numQuestions, setNumQuestions] = useState(10);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
   const [generatedQuizId, setGeneratedQuizId] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState("");
+  const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
     const user = getStoredUser();
@@ -34,9 +35,25 @@ export default function GenerateQuizPage() {
   }, [router]);
 
   const generateMutation = useMutation({
-    mutationFn: async (data: GeneratePayload) => {
-      const res = await api.post<{ quiz_id: string; status_url: string }>("/api/quizzes/generate", data);
-      return res.data;
+    mutationFn: async (data: { topic: string; num_questions: number; difficulty: string; file: File | null }) => {
+      if (data.file) {
+        const formData = new FormData();
+        formData.append("topic", data.topic);
+        formData.append("num_questions", String(data.num_questions));
+        formData.append("difficulty", data.difficulty);
+        formData.append("file", data.file);
+        const res = await api.post<{ quiz_id: string }>("/api/quizzes/generate", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        return res.data;
+      } else {
+        const res = await api.post<{ quiz_id: string }>("/api/quizzes/generate", {
+          topic: data.topic,
+          num_questions: data.num_questions,
+          difficulty: data.difficulty,
+        });
+        return res.data;
+      }
     },
     onSuccess: (data) => setGeneratedQuizId(data.quiz_id),
   });
@@ -54,10 +71,38 @@ export default function GenerateQuizPage() {
 
   const currentStatus = statusData?.generation_status;
 
+  const handleFile = (f: File | null) => {
+    setFileError("");
+    if (!f) { setFile(null); return; }
+    const ext = f.name.toLowerCase();
+    if (!ext.endsWith(".pdf") && !ext.endsWith(".docx")) {
+      setFileError("Only .pdf and .docx files are accepted.");
+      return;
+    }
+    if (f.size > MAX_FILE_SIZE) {
+      setFileError("File is too large. Maximum size is 5MB.");
+      return;
+    }
+    setFile(f);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const f = e.dataTransfer.files?.[0];
+    if (f) handleFile(f);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setGeneratedQuizId(null);
-    generateMutation.mutate({ topic, num_questions: numQuestions, difficulty });
+    generateMutation.mutate({ topic, num_questions: numQuestions, difficulty, file });
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   return (
@@ -87,6 +132,66 @@ export default function GenerateQuizPage() {
                   onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; e.target.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.12)"; }}
                   onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; e.target.style.boxShadow = "none"; }}
                 />
+              </div>
+
+              {/* File Upload */}
+              <div>
+                <label className="block text-sm font-semibold text-white/60 mb-2">
+                  Upload source material <span className="font-normal text-white/30">(optional)</span>
+                </label>
+
+                {!file ? (
+                  <div
+                    className={cn(
+                      "relative rounded-xl border-2 border-dashed transition-all cursor-pointer",
+                      dragging
+                        ? "border-blue-500/50 bg-blue-500/5"
+                        : "border-white/10 hover:border-white/20 hover:bg-white/[0.02]"
+                    )}
+                    onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                    onDragLeave={() => setDragging(false)}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <div className="flex flex-col items-center justify-center py-8 px-4">
+                      <Upload className={cn("w-8 h-8 mb-3", dragging ? "text-blue-400" : "text-white/20")} />
+                      <p className="text-sm text-white/40 text-center">
+                        <span className="text-blue-400 font-medium">Click to upload</span> or drag and drop
+                      </p>
+                      <p className="text-xs text-white/20 mt-1">PDF or DOCX, max 5MB</p>
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf,.docx"
+                      className="hidden"
+                      onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl"
+                    style={{ background: "var(--surface-700)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  >
+                    <FileText className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-white font-medium truncate">{file.name}</p>
+                      <p className="text-xs text-white/30">{formatFileSize(file.size)}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                      className="p-1.5 rounded-lg text-white/30 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
+                {fileError && (
+                  <p className="text-xs text-rose-400 mt-2">{fileError}</p>
+                )}
+                <p className="text-xs text-white/20 mt-2">AI will generate questions based on your document</p>
               </div>
 
               <div>
@@ -148,6 +253,7 @@ export default function GenerateQuizPage() {
                 <h2 className="font-bold text-white mb-1">Generating your quiz</h2>
                 <p className="text-sm text-white/40">
                   <span className="text-white/70 font-medium">{topic}</span> · {numQuestions} questions · {difficulty}
+                  {file && <span className="text-blue-400/60"> · from {file.name}</span>}
                 </p>
               </div>
               <div className="pt-2">

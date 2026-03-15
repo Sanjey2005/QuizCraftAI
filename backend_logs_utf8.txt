@@ -1,0 +1,132 @@
+﻿backend-1  | Operations to perform:
+backend-1  |   Apply all migrations: admin, attempts, auth, contenttypes, quizzes, sessions, token_blacklist, users
+backend-1  | Running migrations:
+backend-1  |   No migrations to apply.
+backend-1  | [2026-03-14 14:09:12 +0000] [8] [INFO] Starting gunicorn 23.0.0
+backend-1  | [2026-03-14 14:09:12 +0000] [8] [INFO] Listening at: http://0.0.0.0:8000 (8)
+backend-1  | [2026-03-14 14:09:12 +0000] [8] [INFO] Using worker: sync
+backend-1  | [2026-03-14 14:09:12 +0000] [9] [INFO] Booting worker with pid: 9
+backend-1  | [2026-03-14 14:09:12 +0000] [10] [INFO] Booting worker with pid: 10
+backend-1  | [2026-03-14 14:09:12 +0000] [11] [INFO] Booting worker with pid: 11
+backend-1  | [2026-03-14 14:09:12 +0000] [12] [INFO] Booting worker with pid: 12
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   return self._jws.encode(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | Operations to perform:
+backend-1  |   Apply all migrations: admin, attempts, auth, contenttypes, quizzes, sessions, token_blacklist, users
+backend-1  | Running migrations:
+backend-1  |   No migrations to apply.
+backend-1  | [2026-03-14 14:38:33 +0000] [8] [INFO] Starting gunicorn 23.0.0
+backend-1  | [2026-03-14 14:38:33 +0000] [8] [INFO] Listening at: http://0.0.0.0:8000 (8)
+backend-1  | [2026-03-14 14:38:33 +0000] [8] [INFO] Using worker: sync
+backend-1  | [2026-03-14 14:38:33 +0000] [9] [INFO] Booting worker with pid: 9
+backend-1  | [2026-03-14 14:38:33 +0000] [10] [INFO] Booting worker with pid: 10
+backend-1  | [2026-03-14 14:38:33 +0000] [11] [INFO] Booting worker with pid: 11
+backend-1  | [2026-03-14 14:38:33 +0000] [12] [INFO] Booting worker with pid: 12
+backend-1  | Unauthorized: /api/analytics/me
+backend-1  | Unauthorized: /api/analytics/quiz/00000000-0000-0000-0000-000000000000/leaderboard
+backend-1  | Operations to perform:
+backend-1  |   Apply all migrations: admin, attempts, auth, contenttypes, quizzes, sessions, token_blacklist, users
+backend-1  | Running migrations:
+backend-1  |   No migrations to apply.
+backend-1  | [2026-03-14 15:02:26 +0000] [8] [INFO] Starting gunicorn 23.0.0
+backend-1  | [2026-03-14 15:02:26 +0000] [8] [INFO] Listening at: http://0.0.0.0:8000 (8)
+backend-1  | [2026-03-14 15:02:26 +0000] [8] [INFO] Using worker: sync
+backend-1  | [2026-03-14 15:02:26 +0000] [9] [INFO] Booting worker with pid: 9
+backend-1  | [2026-03-14 15:02:26 +0000] [10] [INFO] Booting worker with pid: 10
+backend-1  | [2026-03-14 15:02:26 +0000] [11] [INFO] Booting worker with pid: 11
+backend-1  | [2026-03-14 15:02:26 +0000] [12] [INFO] Booting worker with pid: 12
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | Unauthorized: /api/quizzes
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   return self._jws.encode(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | Bad Request: /api/attempts
+backend-1  | Bad Request: /api/attempts
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   return self._jws.encode(
+backend-1  | Not Found: /api/attempts/
+backend-1  | Not Found: /api/attempts/
+backend-1  | Operations to perform:
+backend-1  |   Apply all migrations: admin, attempts, auth, contenttypes, quizzes, sessions, token_blacklist, users
+backend-1  | Running migrations:
+backend-1  |   No migrations to apply.
+backend-1  | [2026-03-14 18:37:17 +0000] [8] [INFO] Starting gunicorn 23.0.0
+backend-1  | [2026-03-14 18:37:17 +0000] [8] [INFO] Listening at: http://0.0.0.0:8000 (8)
+backend-1  | [2026-03-14 18:37:17 +0000] [8] [INFO] Using worker: sync
+backend-1  | [2026-03-14 18:37:17 +0000] [9] [INFO] Booting worker with pid: 9
+backend-1  | [2026-03-14 18:37:17 +0000] [10] [INFO] Booting worker with pid: 10
+backend-1  | [2026-03-14 18:37:17 +0000] [11] [INFO] Booting worker with pid: 11
+backend-1  | [2026-03-14 18:37:17 +0000] [12] [INFO] Booting worker with pid: 12
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   return self._jws.encode(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   return self._jws.encode(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | Unauthorized: /api/auth/token
+backend-1  | Unauthorized: /api/auth/token
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   return self._jws.encode(
+backend-1  | Unauthorized: /api/auth/token
+backend-1  | Unauthorized: /api/auth/token
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   return self._jws.encode(
+backend-1  | Unauthorized: /api/quizzes
+backend-1  | Unauthorized: /api/quizzes
+backend-1  | Bad Request: /api/auth/register
+backend-1  | Unauthorized: /api/quizzes
+backend-1  | Bad Request: /api/auth/register
+backend-1  | Unauthorized: /api/auth/register
+backend-1  | Bad Request: /api/auth/token/refresh
+backend-1  | Operations to perform:
+backend-1  |   Apply all migrations: admin, attempts, auth, contenttypes, quizzes, sessions, token_blacklist, users
+backend-1  | Running migrations:
+backend-1  |   No migrations to apply.
+backend-1  | [2026-03-15 13:17:41 +0000] [7] [INFO] Starting gunicorn 23.0.0
+backend-1  | [2026-03-15 13:17:41 +0000] [7] [INFO] Listening at: http://0.0.0.0:8000 (7)
+backend-1  | [2026-03-15 13:17:41 +0000] [7] [INFO] Using worker: sync
+backend-1  | [2026-03-15 13:17:41 +0000] [8] [INFO] Booting worker with pid: 8
+backend-1  | [2026-03-15 13:17:41 +0000] [9] [INFO] Booting worker with pid: 9
+backend-1  | [2026-03-15 13:17:41 +0000] [10] [INFO] Booting worker with pid: 10
+backend-1  | [2026-03-15 13:17:41 +0000] [11] [INFO] Booting worker with pid: 11
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | Unauthorized: /api/auth/register
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   return self._jws.encode(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   return self._jws.encode(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   return self._jws.encode(
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   decoded = self.decode_complete(
+backend-1  | Unauthorized: /api/quizzes
+backend-1  | Unauthorized: /api/quizzes
+backend-1  | Unauthorized: /api/analytics/me
+backend-1  | Unauthorized: /api/analytics/me
+backend-1  | Unauthorized: /api/analytics/me
+backend-1  | Unauthorized: /api/analytics/me
+backend-1  | /usr/local/lib/python3.12/site-packages/jwt/api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 24 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+backend-1  |   return self._jws.encode(

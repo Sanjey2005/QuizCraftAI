@@ -19,7 +19,7 @@ Event: TeachEdison Hackathon 2026
 ```
 quizcraftai/
 ├── frontend/         # Next.js 14
-├── backend/          # Django (config/) with apps: users, quizzes, attempts, analytics, ai
+├── backend/          # Django (config/) with apps: users, quizzes, attempts, analytics, ai, classrooms
 ├── docker-compose.yml
 └── CLAUDE.md
 ```
@@ -41,6 +41,7 @@ quizcraftai/
 - attempts — QuizAttempt, AttemptAnswer models + views
 - analytics — services.py + serializers.py + views.py + urls.py (P4 complete)
 - ai — tasks.py (Celery), providers.py (NIM), schemas.py (Pydantic)
+- classrooms — Classroom, ClassroomMembership models + CRUD views + join/leave
 
 ## Key API Endpoints
 ### Auth
@@ -67,6 +68,20 @@ quizcraftai/
 - GET /api/analytics/me — student personal stats (attempts, avg/best score, topic breakdown, score trend)
 - GET /api/analytics/quiz/{id} — instructor aggregate stats for one quiz (owner only)
 - GET /api/analytics/quiz/{id}/leaderboard — top-10 ranked scorers (all authenticated users)
+
+### Classrooms
+- GET  /api/classrooms — list teacher's classrooms (instructor only)
+- POST /api/classrooms — create classroom, auto-generates 6-char code (instructor only)
+- GET  /api/classrooms/{id} — classroom detail with member list
+- PATCH /api/classrooms/{id} — update name/description (owner only)
+- DELETE /api/classrooms/{id} — soft-deactivate classroom (owner only)
+- POST /api/classrooms/join — student joins via code
+- POST /api/classrooms/{id}/leave — student leaves classroom
+- GET  /api/classrooms/my — student's joined classrooms
+- DELETE /api/classrooms/{id}/members/{membership_id} — teacher removes student
+- GET  /api/classrooms/{id}/quizzes — list assigned quizzes (teacher sees all; students see published+available only)
+- POST /api/classrooms/{id}/assign-quiz — assign quiz to classroom (teacher owner, body: {quiz_id})
+- DELETE /api/classrooms/{id}/remove-quiz — remove quiz from classroom (teacher owner, body: {quiz_id})
 
 ## Database Design Decisions
 - topic_breakdown (JSONB on QuizAttempt): {"algebra": {"correct": 3, "total": 4}}
@@ -153,9 +168,14 @@ All core features complete:
 - Publish/unpublish working
 - Question preview + per-question regenerate working
 - Quiz availability window (available_from, available_until) working
+- Classroom system: create, join via code, member management, teacher/student views
+- Quiz-classroom M2M wiring: assign/remove quizzes per classroom
+- Student quiz visibility scoped to enrolled classrooms only
+- Student dashboard Quizzes tab: quizzes grouped by classroom
+- Teacher classroom detail: assign quiz modal with checklist
+- PDF/DOCX file upload as AI source for quiz generation (PyPDF2 + python-docx)
 
-Remaining for next session:
-- PDF/DOCX upload as AI source
+Remaining:
 - UX polish (toasts, empty states, loading states)
 - Final end-to-end test
 - Deploy to Vercel + Railway
@@ -166,7 +186,7 @@ Remaining for next session:
 | File | Contents |
 |------|----------|
 | backend/apps/users/views.py | JWT register, login, token refresh |
-| backend/apps/quizzes/views.py | Quiz CRUD + generate + status poll + questions-edit + regenerate-question |
+| backend/apps/quizzes/views.py | Quiz CRUD + generate (multipart file upload) + status poll + questions-edit + regenerate-question |
 | backend/apps/quizzes/serializers.py | QuizSerializer, QuestionEditSerializer, ChoiceEditSerializer |
 | backend/apps/quizzes/models.py | Quiz with available_from, available_until fields |
 | backend/apps/attempts/services.py | start_attempt, submit_answer, complete_attempt |
@@ -175,8 +195,12 @@ Remaining for next session:
 | backend/apps/analytics/serializers.py | StudentAnalytics, QuizAnalytics, Leaderboard |
 | backend/apps/analytics/views.py | 3 APIViews with correct permission guards |
 | backend/apps/analytics/urls.py | 3 routes under api/analytics/ |
-| backend/config/urls.py | All 4 app URL includes wired |
-| backend/apps/ai/providers.py | call_nim() using Llama 3.1 + json_object format |
+| backend/apps/classrooms/models.py | Classroom + ClassroomMembership with auto-generated 6-char code |
+| backend/apps/classrooms/views.py | CRUD + join/leave/my + remove member + ClassroomQuizzesView + AssignQuizView + RemoveQuizView |
+| backend/apps/classrooms/serializers.py | ClassroomSerializer, ClassroomDetailSerializer, JoinClassroomSerializer |
+| backend/apps/classrooms/urls.py | 6 routes under api/classrooms/ |
+| backend/config/urls.py | All 5 app URL includes wired |
+| backend/apps/ai/providers.py | call_nim() + extract_text_from_file (PDF/DOCX) + content-aware prompts |
 | backend/apps/ai/tasks.py | Celery generate_quiz_task with retry/backoff + default time_limit |
 
 ### Quiz API Additions
@@ -190,13 +214,14 @@ Remaining for next session:
 | /login | app/(auth)/login/page.tsx | ✅ JWT login form |
 | /register | app/(auth)/register/page.tsx | ✅ Role-select registration |
 | /quizzes | app/quizzes/page.tsx | ✅ Browse + filter published quizzes |
-| /quizzes/generate | app/quizzes/generate/page.tsx | ✅ AI form + polling → redirects to edit on complete |
+| /quizzes/generate | app/quizzes/generate/page.tsx | ✅ AI form + PDF/DOCX upload + polling → redirects to edit on complete |
 | /quizzes/[id] | app/quizzes/[id]/page.tsx | ✅ Quiz detail + Start CTA |
 | /quizzes/[id]/attempt | app/quizzes/[id]/attempt/page.tsx | ✅ Full take-quiz UI with timers + auto-submit |
 | /quizzes/[id]/edit | app/quizzes/[id]/edit/page.tsx | ✅ Settings + question preview + per-question regenerate + availability window |
 | /attempts/[id]/results | app/attempts/[id]/results/page.tsx | ✅ Score + topic chart + review |
-| /dashboard/student | app/dashboard/student/page.tsx | ✅ Stats cards + topic bars + recent attempts |
-| /dashboard/instructor | app/dashboard/instructor/page.tsx | ✅ Quiz list + availability badges + Generate CTA |
+| /dashboard/student | app/dashboard/student/page.tsx | ✅ Stats + recent attempts + quizzes-by-classroom tab + classrooms tab |
+| /dashboard/instructor | app/dashboard/instructor/page.tsx | ✅ Quiz list + classrooms tab + create modal + availability badges |
+| /classrooms/[id] | app/classrooms/[id]/page.tsx | ✅ Teacher: members + assign-quiz modal + remove; Student: quiz cards + leave |
 | /analytics/quiz/[id] | app/analytics/quiz/[id]/page.tsx | ✅ Instructor stats + topic chart |
 | /analytics/quiz/[id]/leaderboard | app/analytics/quiz/[id]/leaderboard/page.tsx | ✅ Gold/silver/bronze podium |
 | /analytics/me | app/analytics/me/page.tsx | ✅ Student analytics with error handling |
@@ -220,3 +245,6 @@ Remaining for next session:
 - ✅ Render instructor leaderboard correctly
 - ✅ Preview questions + regenerate individual questions before publishing
 - ✅ Set quiz availability window (scheduled / expired / always on)
+- ✅ Create classroom with auto-generated code, share with students
+- ✅ Students join classroom via 6-char code
+- ✅ Teacher views member list, removes students

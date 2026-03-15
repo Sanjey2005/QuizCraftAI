@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "apps.attempts",
     "apps.analytics",
     "apps.ai",
+    "apps.classrooms",
 ]
 
 MIDDLEWARE = [

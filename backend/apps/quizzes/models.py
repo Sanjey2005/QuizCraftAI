@@ -44,6 +44,11 @@ class Quiz(models.Model):
     )
     available_from = models.DateTimeField(null=True, blank=True)
     available_until = models.DateTimeField(null=True, blank=True)
+    classrooms = models.ManyToManyField(
+        "classrooms.Classroom",
+        blank=True,
+        related_name="quizzes",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

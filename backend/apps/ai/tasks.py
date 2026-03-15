@@ -12,7 +12,7 @@ from .providers import call_nim
     time_limit=120,
     soft_time_limit=90,
 )
-def generate_quiz_task(self, quiz_id, topic, num_questions, difficulty):
+def generate_quiz_task(self, quiz_id, topic, num_questions, difficulty, content=None):
     from apps.quizzes.models import Quiz, Question, Choice
 
     quiz = Quiz.objects.get(id=quiz_id)
@@ -20,7 +20,7 @@ def generate_quiz_task(self, quiz_id, topic, num_questions, difficulty):
     quiz.save(update_fields=["generation_status"])
 
     try:
-        result = call_nim(topic, num_questions, difficulty)
+        result = call_nim(topic, num_questions, difficulty, content)
 
         # Validate: exactly 1 correct per question, no duplicate choices
         for i, q in enumerate(result.questions):

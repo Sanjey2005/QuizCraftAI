@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions, status
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -31,10 +32,27 @@ class QuizListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         mine = self.request.query_params.get("mine") == "true"
-        if mine and self.request.user.is_authenticated and self.request.user.role == "instructor":
-            qs = Quiz.objects.filter(creator=self.request.user).order_by("-created_at")
+        user = self.request.user
+        now = timezone.now()
+
+        if mine and user.is_authenticated and user.role == "instructor":
+            qs = Quiz.objects.filter(creator=user).order_by("-created_at")
+        elif user.is_authenticated and user.role == "student":
+            from apps.classrooms.models import ClassroomMembership
+            classroom_ids = ClassroomMembership.objects.filter(
+                student=user
+            ).values_list("classroom_id", flat=True)
+            if not classroom_ids:
+                return Quiz.objects.none()
+            qs = Quiz.objects.filter(
+                classrooms__id__in=classroom_ids,
+                is_published=True,
+            ).filter(
+                models.Q(available_from__isnull=True) | models.Q(available_from__lte=now)
+            ).filter(
+                models.Q(available_until__isnull=True) | models.Q(available_until__gte=now)
+            ).distinct()
         else:
-            now = timezone.now()
             qs = Quiz.objects.filter(
                 is_published=True,
             ).filter(
@@ -42,6 +60,7 @@ class QuizListCreateView(generics.ListCreateAPIView):
             ).filter(
                 models.Q(available_until__isnull=True) | models.Q(available_until__gte=now)
             )
+
         topic = self.request.query_params.get("topic")
         difficulty = self.request.query_params.get("difficulty")
         if topic:
@@ -62,6 +81,7 @@ class QuizListCreateView(generics.ListCreateAPIView):
 class QuizGenerateView(generics.CreateAPIView):
     serializer_class = QuizGenerateSerializer
     permission_classes = [IsInstructor]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -69,6 +89,17 @@ class QuizGenerateView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
 
         data = serializer.validated_data
+
+        # Extract text from uploaded file if present
+        content = None
+        uploaded_file = request.FILES.get("file")
+        if uploaded_file:
+            from apps.ai.providers import extract_text_from_file
+            try:
+                content = extract_text_from_file(uploaded_file, uploaded_file.name)
+            except ValueError as e:
+                return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         quiz = Quiz.objects.create(
             creator=request.user,
             title=f"Quiz: {data['topic']}",
@@ -82,6 +113,7 @@ class QuizGenerateView(generics.CreateAPIView):
             data["topic"],
             data["num_questions"],
             data["difficulty"],
+            content,
         )
 
         return Response(
