@@ -1,0 +1,80 @@
+services:
+  # ---------- Redis ----------
+  - type: redis
+    name: quizcraftai-redis
+    plan: free
+    maxmemoryPolicy: noeviction
+
+  # ---------- Backend ----------
+  - type: web
+    name: quizcraftai-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "quizcraftai-backend.onrender.com"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: quizcraftai-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: quizcraftai-redis
+          type: redis
+          property: connectionString
+      - key: NVIDIA_API_KEY
+        sync: false
+
+  # ---------- Celery Worker ----------
+  - type: worker
+    name: quizcraftai-celery
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    startCommand: celery -A config worker -l info
+    envVars:
+      - key: SECRET_KEY
+        fromService:
+          name: quizcraftai-backend
+          type: web
+          envVarKey: SECRET_KEY
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: quizcraftai-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: quizcraftai-redis
+          type: redis
+          property: connectionString
+      - key: NVIDIA_API_KEY
+        sync: false
+
+  # ---------- Frontend ----------
+  - type: web
+    name: quizcraftai-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          name: quizcraftai-backend
+          type: web
+          property: host
+
+databases:
+  - name: quizcraftai-db
+    databaseName: quizcraftdb
+    user: quizuser
+    plan: free
