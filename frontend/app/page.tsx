@@ -3,6 +3,10 @@
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 import { ArrowDown, Brain, Zap, BarChart3, ChevronRight } from "lucide-react";
+import { LogoCloud } from "@/components/ui/logo-cloud";
+import { Testimonials } from "@/components/ui/testimonials-columns";
+import { WorldMap } from "@/components/ui/world-map";
+import { FaqsSection } from "@/components/ui/faqs-section";
 
 export default function LandingPage() {
   const staggerContainer: Variants = {
@@ -208,6 +212,49 @@ export default function LandingPage() {
           ))}
         </motion.div>
       </section>
+
+      {/* Logo Cloud */}
+      <LogoCloud />
+
+      {/* Testimonials */}
+      <Testimonials />
+
+      {/* World Map */}
+      <section className="py-32 px-6 border-t border-[#2A2A2A]">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-12"
+          >
+            <h2
+              className="text-3xl md:text-4xl font-bold tracking-tight mb-4"
+              style={{ letterSpacing: "-0.02em" }}
+            >
+              Used by educators worldwide.
+            </h2>
+            <p className="text-[#A0A0A0] text-lg max-w-2xl mx-auto">
+              QuizCraft AI powers classrooms across 6 continents — wherever teachers and students need smarter assessments.
+            </p>
+          </motion.div>
+          <WorldMap
+            lineColor="#2563EB"
+            dots={[
+              { start: { lat: 40.7128, lng: -74.006  }, end: { lat: 51.5074,  lng: -0.1278   } }, // NY → London
+              { start: { lat: 51.5074, lng: -0.1278  }, end: { lat: 28.6139,  lng: 77.209    } }, // London → New Delhi
+              { start: { lat: 28.6139, lng: 77.209   }, end: { lat: -33.8688, lng: 151.2093  } }, // New Delhi → Sydney
+              { start: { lat: 40.7128, lng: -74.006  }, end: { lat: -23.5505, lng: -46.6333  } }, // NY → São Paulo
+              { start: { lat: -23.5505, lng: -46.6333}, end: { lat: 51.5074,  lng: -0.1278   } }, // São Paulo → London
+              { start: { lat: 28.6139, lng: 77.209   }, end: { lat: 1.3521,   lng: 103.8198  } }, // New Delhi → Singapore
+            ]}
+          />
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <FaqsSection />
 
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-[#2A2A2A] bg-[#0A0A0A]">

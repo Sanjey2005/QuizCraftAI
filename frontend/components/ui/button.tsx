@@ -11,7 +11,7 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "premium", size = "default", ...props }, ref) => {
+  ({ className, variant = "premium", size = "default", asChild: _asChild, ...props }, ref) => {
     
     // Base styles
     const baseStyles = "inline-flex items-center justify-center rounded-md font-medium transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none";

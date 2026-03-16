@@ -68,7 +68,7 @@ export function Sidebar() {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="px-5 h-16 flex items-center gap-3 shrink-0">
+      <Link href="/" className="px-5 h-16 flex items-center gap-3 shrink-0 hover:opacity-80 transition-opacity">
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-black"
           style={{ backgroundColor: "#2563EB" }}
@@ -78,7 +78,7 @@ export function Sidebar() {
         <span className="font-bold text-[15px] tracking-tight text-white">
           QuizCraft AI
         </span>
-      </div>
+      </Link>
 
       {/* Navigation */}
       <nav className="flex-1 px-3 mt-2 space-y-0.5 overflow-y-auto custom-scrollbar">
