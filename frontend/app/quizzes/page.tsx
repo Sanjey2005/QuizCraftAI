@@ -95,7 +95,7 @@ export default function QuizzesPage() {
               className={cn(
                 "px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
                 difficulty === d.value
-                  ? "bg-blue-50 text-[#2563EB] border border-blue-200"
+                  ? "bg-white text-black font-semibold shadow-[0_0_15px_rgba(255,255,255,0.1)]"
                   : "text-white/60 bg-[#1A1A1A] border border-white/30 hover:text-white/80 hover:bg-background"
               )}
             >
