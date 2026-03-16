@@ -17,10 +17,10 @@ import { LoadingScreen } from "@/components/ui/loading-screen";
 import { CreativePricing, type PricingTier } from "@/components/ui/creative-pricing";
 
 const navItems = [
-  { name: "Features", link: "#features" },
-  { name: "Journey", link: "#journey" },
-  { name: "Pricing", link: "#pricing" },
-  { name: "FAQ", link: "#faq" },
+  { name: "Features", link: "/features" },
+  { name: "Journey", link: "/#journey" },
+  { name: "Pricing", link: "/#pricing" },
+  { name: "FAQ", link: "/#faq" },
 ];
 
 const timelineData = [
@@ -214,7 +214,7 @@ export default function LandingPage() {
                       <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                     <Link
-                      href="#features"
+                      href="/features"
                       className="px-6 py-3 font-medium text-[#A0A0A0] transition-colors hover:text-white flex items-center gap-2 border border-[#2A2A2A] rounded-md hover:border-[#3A3A3A]"
                     >
                       See Features
