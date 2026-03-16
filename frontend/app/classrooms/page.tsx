@@ -79,7 +79,7 @@ function CreateClassroomModal({ open, onClose }: { open: boolean; onClose: () =>
           <h3 className="text-lg font-bold text-white">
             {createdCode ? "Classroom Created!" : "Create Classroom"}
           </h3>
-          <button onClick={handleClose} className="p-1.5 rounded-lg text-white/40 hover:text-slate-600 hover:bg-background border border-white/10 transition-all">
+          <button onClick={handleClose} className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-background border border-white/10 transition-all">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -188,7 +188,7 @@ function JoinClassroomModal({ open, onClose }: { open: boolean; onClose: () => v
       >
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-white">Join Classroom</h3>
-          <button onClick={handleClose} className="p-1.5 rounded-lg text-white/40 hover:text-slate-600 hover:bg-background border border-white/10 transition-all">
+          <button onClick={handleClose} className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-background border border-white/10 transition-all">
             <X className="w-4 h-4" />
           </button>
         </div>

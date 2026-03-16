@@ -84,7 +84,7 @@ export default function QuizzesPage() {
             value={search}
             onChange={handleSearchChange}
             placeholder="Search by topic..."
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-slate-400 bg-[#1A1A1A] border border-white/30 outline-none transition-all focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-white/40 bg-[#1A1A1A] border border-white/30 outline-none transition-all focus:border-white/60 focus:ring-2 focus:ring-white/5"
           />
         </div>
         <div className="flex gap-1.5">
