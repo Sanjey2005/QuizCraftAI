@@ -374,10 +374,10 @@ export default function LandingPage() {
                   <span className="text-[#555555] font-medium text-sm">QuizCraft AI © 2026</span>
                 </div>
                 <div className="flex gap-6">
-                  <Link href="#" className="text-[#555555] hover:text-[#A0A0A0] transition-colors text-sm">Privacy</Link>
-                  <Link href="#" className="text-[#555555] hover:text-[#A0A0A0] transition-colors text-sm">Terms</Link>
-                  <Link href="#" className="text-[#555555] hover:text-[#A0A0A0] transition-colors text-sm">Twitter</Link>
-                  <Link href="#" className="text-[#555555] hover:text-[#A0A0A0] transition-colors text-sm">GitHub</Link>
+                  <Link href="/" className="text-[#555555] hover:text-[#A0A0A0] transition-colors text-sm">Privacy</Link>
+                  <Link href="/" className="text-[#555555] hover:text-[#A0A0A0] transition-colors text-sm">Terms</Link>
+                  <Link href="https://x.com" target="_blank" rel="noopener noreferrer" className="text-[#555555] hover:text-[#A0A0A0] transition-colors text-sm">Twitter</Link>
+                  <Link href="https://github.com/Sanjey2005/QuizCraftAI" target="_blank" rel="noopener noreferrer" className="text-[#555555] hover:text-[#A0A0A0] transition-colors text-sm">GitHub</Link>
                 </div>
               </div>
             </footer>

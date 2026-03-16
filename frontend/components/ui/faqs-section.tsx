@@ -90,7 +90,7 @@ export function FaqsSection() {
 
         <p className="mt-8 text-[#555555] text-sm">
           Still have questions?{" "}
-          <a href="#" className="text-white hover:underline transition-colors">
+          <a href="mailto:support@quizcraft.ai" className="text-white hover:underline transition-colors">
             Contact support
           </a>
         </p>

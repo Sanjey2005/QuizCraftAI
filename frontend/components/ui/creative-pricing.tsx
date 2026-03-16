@@ -125,9 +125,7 @@ function CreativePricing({
                   "shadow-[4px_4px_0px_0px] shadow-white/10",
                   "hover:shadow-[6px_6px_0px_0px]",
                   "hover:translate-x-[-2px] hover:translate-y-[-2px]",
-                  tier.popular
-                    ? "bg-amber-400 text-zinc-900 hover:bg-amber-300 border-amber-400"
-                    : "bg-[#1A1A1A] text-white hover:bg-[#2A2A2A]"
+                  "bg-[#1A1A1A] text-white font-medium hover:bg-[#2A2A2A]"
                 )}
               >
                 Get Started
