@@ -40,7 +40,7 @@ export function AnswerChoice({
       className={cn(
         "flex items-center gap-4 w-full min-h-[64px] px-5 py-4 rounded-xl border cursor-pointer transition-all duration-200 text-left select-none group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20",
         isDefault &&
-          "bg-surface-2 border-border/50 hover:border-white/20 hover:bg-surface",
+          "bg-surface-2 border-white/20 hover:border-white/50 hover:bg-surface",
         selected &&
           !correct &&
           !incorrect &&
@@ -53,7 +53,7 @@ export function AnswerChoice({
       <span
         className={cn(
           "flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold transition-colors border",
-          isDefault && "bg-background border-border/50 text-secondary group-hover:text-primary group-hover:border-white/20",
+          isDefault && "bg-background border-white/20 text-white/80 group-hover:text-white group-hover:border-white/50",
           selected && !correct && !incorrect && "bg-white text-black border-transparent",
           correct && "bg-success text-white border-transparent",
           incorrect && "bg-danger text-white border-transparent"

@@ -5,14 +5,18 @@ from .models import Quiz, Question, Choice
 
 class QuizSerializer(serializers.ModelSerializer):
     question_count = serializers.SerializerMethodField()
+    classroom_ids = serializers.SerializerMethodField()
 
     def get_question_count(self, obj):
         return obj.questions.count()
 
+    def get_classroom_ids(self, obj):
+        return list(obj.classrooms.values_list('id', flat=True))
+
     class Meta:
         model = Quiz
         fields = "__all__"
-        read_only_fields = ["id", "creator", "created_at", "generation_status"]
+        read_only_fields = ["id", "creator", "created_at", "generation_status", "classroom_ids"]
 
 
 class QuizGenerateSerializer(serializers.Serializer):

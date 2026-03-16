@@ -32,14 +32,14 @@ const DIFFICULTY_STYLES: Record<string, string> = {
 
 function QuizCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl p-6 animate-pulse border border-slate-200 shadow-sm">
-      <div className="h-5 bg-slate-100 rounded w-3/4 mb-3" />
-      <div className="h-3.5 bg-slate-100 rounded w-1/2 mb-4" />
+    <div className="bg-[#1A1A1A] rounded-2xl p-6 animate-pulse border border-white/30 shadow-sm">
+      <div className="h-5 bg-background border border-white/10 rounded w-3/4 mb-3" />
+      <div className="h-3.5 bg-background border border-white/10 rounded w-1/2 mb-4" />
       <div className="flex gap-2 mb-5">
-        <div className="h-5 bg-slate-100 rounded-full w-16" />
-        <div className="h-5 bg-slate-100 rounded-full w-14" />
+        <div className="h-5 bg-background border border-white/10 rounded-full w-16" />
+        <div className="h-5 bg-background border border-white/10 rounded-full w-14" />
       </div>
-      <div className="h-8 bg-slate-100 rounded-lg w-28" />
+      <div className="h-8 bg-background border border-white/10 rounded-lg w-28" />
     </div>
   );
 }
@@ -71,20 +71,20 @@ export default function QuizzesPage() {
     <PageWrapper>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">Discover Quizzes</h1>
-        <p className="text-slate-500 text-sm">Browse AI-generated quizzes on any topic</p>
+        <h1 className="text-2xl font-bold text-white mb-1">Discover Quizzes</h1>
+        <p className="text-white/60 text-sm">Browse AI-generated quizzes on any topic</p>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-8">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
           <input
             type="text"
             value={search}
             onChange={handleSearchChange}
             placeholder="Search by topic..."
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm text-slate-900 placeholder-slate-400 bg-white border border-slate-200 outline-none transition-all focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-slate-400 bg-[#1A1A1A] border border-white/30 outline-none transition-all focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100"
           />
         </div>
         <div className="flex gap-1.5">
@@ -96,7 +96,7 @@ export default function QuizzesPage() {
                 "px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
                 difficulty === d.value
                   ? "bg-blue-50 text-[#2563EB] border border-blue-200"
-                  : "text-slate-500 bg-white border border-slate-200 hover:text-slate-700 hover:bg-slate-50"
+                  : "text-white/60 bg-[#1A1A1A] border border-white/30 hover:text-white/80 hover:bg-background"
               )}
             >
               {d.label}
@@ -112,11 +112,11 @@ export default function QuizzesPage() {
         </div>
       ) : quizzes.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mb-4">
-            <BookOpen className="w-8 h-8 text-slate-400" />
+          <div className="w-16 h-16 rounded-2xl bg-background border border-white/10 border border-white/30 flex items-center justify-center mb-4">
+            <BookOpen className="w-8 h-8 text-white/40" />
           </div>
-          <p className="text-slate-800 font-semibold mb-1">No quizzes found</p>
-          <p className="text-slate-500 text-sm">Try a different topic or difficulty</p>
+          <p className="text-white font-semibold mb-1">No quizzes found</p>
+          <p className="text-white/60 text-sm">Try a different topic or difficulty</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -124,18 +124,18 @@ export default function QuizzesPage() {
             <Link
               key={quiz.id}
               href={`/quizzes/${quiz.id}`}
-              className="group bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+              className="group bg-[#1A1A1A] rounded-2xl p-6 border border-white/30 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
             >
-              <h3 className="font-semibold text-slate-800 mb-1 group-hover:text-[#2563EB] transition-colors line-clamp-2">
+              <h3 className="font-semibold text-white mb-1 group-hover:text-[#2563EB] transition-colors line-clamp-2">
                 {quiz.title}
               </h3>
-              <p className="text-sm text-slate-500 mb-4">{quiz.topic}</p>
+              <p className="text-sm text-white/60 mb-4">{quiz.topic}</p>
               <div className="flex items-center gap-2 mb-5">
                 <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-semibold border capitalize", DIFFICULTY_STYLES[quiz.difficulty])}>
                   {quiz.difficulty}
                 </span>
                 {quiz.question_count != null && (
-                  <span className="text-xs text-slate-400">{quiz.question_count} questions</span>
+                  <span className="text-xs text-white/40">{quiz.question_count} questions</span>
                 )}
               </div>
               <div className="flex items-center gap-1.5 text-sm font-semibold text-[#2563EB]">

@@ -72,23 +72,23 @@ function CreateClassroomModal({ open, onClose }: { open: boolean; onClose: () =>
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative w-full max-w-md rounded-2xl p-6 bg-white border border-slate-200 shadow-xl"
+        className="relative w-full max-w-md rounded-2xl p-6 bg-[#1A1A1A] border border-white/30 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold text-slate-900">
+          <h3 className="text-lg font-bold text-white">
             {createdCode ? "Classroom Created!" : "Create Classroom"}
           </h3>
-          <button onClick={handleClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
+          <button onClick={handleClose} className="p-1.5 rounded-lg text-white/40 hover:text-slate-600 hover:bg-background border border-white/10 transition-all">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {createdCode ? (
           <div className="text-center py-4">
-            <p className="text-slate-500 text-sm mb-4">Share this code with your students:</p>
-            <div className="rounded-xl p-4 mb-4 bg-slate-50 border border-slate-200">
-              <p className="text-3xl font-black text-slate-900 tracking-[0.3em] font-mono">{createdCode}</p>
+            <p className="text-white/60 text-sm mb-4">Share this code with your students:</p>
+            <div className="rounded-xl p-4 mb-4 bg-background border border-white/30">
+              <p className="text-3xl font-black text-white tracking-[0.3em] font-mono">{createdCode}</p>
             </div>
             <button
               onClick={copyCode}
@@ -106,24 +106,24 @@ function CreateClassroomModal({ open, onClose }: { open: boolean; onClose: () =>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Name</label>
+              <label className="block text-sm font-medium text-white/80 mb-1.5">Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. CS101 — Spring 2026"
-                className="w-full px-4 py-2.5 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 outline-none border border-slate-200 bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-all"
+                className="w-full px-4 py-2.5 rounded-xl text-sm text-white placeholder:text-white/40 outline-none border border-white/30 bg-[#1A1A1A] focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-all"
                 autoFocus
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Description (optional)</label>
+              <label className="block text-sm font-medium text-white/80 mb-1.5">Description (optional)</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Brief description of the classroom..."
                 rows={3}
-                className="w-full px-4 py-2.5 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 outline-none border border-slate-200 bg-white focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-all resize-none"
+                className="w-full px-4 py-2.5 rounded-xl text-sm text-white placeholder:text-white/40 outline-none border border-white/30 bg-[#1A1A1A] focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] transition-all resize-none"
               />
             </div>
             <button
@@ -183,25 +183,25 @@ function JoinClassroomModal({ open, onClose }: { open: boolean; onClose: () => v
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative w-full max-w-sm rounded-2xl p-6 bg-white border border-slate-200 shadow-xl"
+        className="relative w-full max-w-sm rounded-2xl p-6 bg-[#1A1A1A] border border-white/30 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold text-slate-900">Join Classroom</h3>
-          <button onClick={handleClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all">
+          <h3 className="text-lg font-bold text-white">Join Classroom</h3>
+          <button onClick={handleClose} className="p-1.5 rounded-lg text-white/40 hover:text-slate-600 hover:bg-background border border-white/10 transition-all">
             <X className="w-4 h-4" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Classroom Code</label>
+            <label className="block text-sm font-medium text-white/80 mb-1.5">Classroom Code</label>
             <input
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 6))}
               placeholder="e.g. ABC123"
               maxLength={6}
-              className="w-full px-4 py-3 rounded-xl text-center text-2xl font-black tracking-[0.3em] font-mono text-slate-900 placeholder:text-slate-300 outline-none border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] focus:bg-white transition-all"
+              className="w-full px-4 py-3 rounded-xl text-center text-2xl font-black tracking-[0.3em] font-mono text-white placeholder:text-white/30 outline-none border border-white/30 bg-background focus:ring-2 focus:ring-[#2563EB]/20 focus:border-[#2563EB] focus:bg-[#1A1A1A] transition-all"
               autoFocus
             />
           </div>
@@ -251,10 +251,10 @@ export default function ClassroomsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-white">
             {isInstructor ? "Classrooms" : "My Classrooms"}
           </h1>
-          <p className="text-slate-500 text-sm mt-0.5">
+          <p className="text-white/60 text-sm mt-0.5">
             {isInstructor
               ? "Manage your classrooms and share codes with students"
               : "Classrooms you've joined"}
@@ -273,23 +273,23 @@ export default function ClassroomsPage() {
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="rounded-xl p-6 animate-pulse bg-white border border-slate-200 shadow-sm">
-              <div className="h-5 bg-slate-100 rounded w-2/3 mb-3" />
-              <div className="h-3 bg-slate-100 rounded w-1/3 mb-4" />
-              <div className="h-3 bg-slate-100 rounded w-1/4" />
+            <div key={i} className="rounded-xl p-6 animate-pulse bg-[#1A1A1A] border border-white/30 shadow-sm">
+              <div className="h-5 bg-background border border-white/10 rounded w-2/3 mb-3" />
+              <div className="h-3 bg-background border border-white/10 rounded w-1/3 mb-4" />
+              <div className="h-3 bg-background border border-white/10 rounded w-1/4" />
             </div>
           ))}
         </div>
       ) : classrooms.length === 0 ? (
-        <div className="rounded-xl overflow-hidden bg-white border border-slate-200 shadow-sm">
+        <div className="rounded-xl overflow-hidden bg-[#1A1A1A] border border-white/30 shadow-sm">
           <div className="flex flex-col items-center justify-center py-20 text-center px-4">
             <div className="w-16 h-16 rounded-2xl bg-violet-50 border border-violet-100 flex items-center justify-center mb-4">
               <School className="w-8 h-8 text-violet-600" />
             </div>
-            <p className="text-slate-900 font-bold text-lg mb-2">
+            <p className="text-white font-bold text-lg mb-2">
               {isInstructor ? "No classrooms yet" : "No classrooms joined"}
             </p>
-            <p className="text-slate-500 text-sm mb-6 max-w-xs">
+            <p className="text-white/60 text-sm mb-6 max-w-xs">
               {isInstructor
                 ? "Create a classroom and share the code with your students."
                 : "Ask your instructor for a classroom code to get started."}
@@ -311,18 +311,18 @@ export default function ClassroomsPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 + idx * 0.04 }}
-              className="rounded-xl overflow-hidden bg-white border border-slate-200 shadow-sm cursor-pointer group transition-all hover:shadow-md"
+              className="rounded-xl overflow-hidden bg-[#1A1A1A] border border-white/30 shadow-sm cursor-pointer group transition-all hover:shadow-md"
               onClick={() => router.push(`/classrooms/${classroom.id}`)}
             >
               <div className="h-1 bg-gradient-to-r from-[#2563EB] to-[#1E3A5F]" />
               <div className="p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-slate-900 text-base truncate group-hover:text-[#2563EB] transition-colors">
+                    <p className="font-bold text-white text-base truncate group-hover:text-[#2563EB] transition-colors">
                       {classroom.name}
                     </p>
                     {classroom.description && (
-                      <p className="text-xs text-slate-500 mt-0.5 truncate">{classroom.description}</p>
+                      <p className="text-xs text-white/60 mt-0.5 truncate">{classroom.description}</p>
                     )}
                   </div>
                   {isInstructor && (
@@ -331,7 +331,7 @@ export default function ClassroomsPage() {
                         onClick={() => {
                           if (confirm("Deactivate this classroom?")) deleteClassroomMutation.mutate(classroom.id);
                         }}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all"
+                        className="p-1.5 rounded-lg text-white/40 hover:text-red-600 hover:bg-red-50 transition-all"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -340,13 +340,13 @@ export default function ClassroomsPage() {
                 </div>
 
                 {isInstructor && (
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg mb-4 bg-slate-50 border border-slate-200 w-fit">
-                    <span className="text-lg font-black text-slate-900 tracking-[0.2em] font-mono">{classroom.code}</span>
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg mb-4 bg-background border border-white/30 w-fit">
+                    <span className="text-lg font-black text-white tracking-[0.2em] font-mono">{classroom.code}</span>
                     <CopyButton text={classroom.code} />
                   </div>
                 )}
 
-                <div className="flex items-center gap-4 text-xs text-slate-500">
+                <div className="flex items-center gap-4 text-xs text-white/60">
                   <span className="flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5" />
                     {classroom.member_count} {isInstructor ? "student" : "member"}{classroom.member_count !== 1 ? "s" : ""}
@@ -388,7 +388,7 @@ function CopyButton({ text }: { text: string }) {
       {copied ? (
         <Check className="w-3.5 h-3.5 text-emerald-600" />
       ) : (
-        <Copy className="w-3.5 h-3.5 text-slate-400 hover:text-slate-500" />
+        <Copy className="w-3.5 h-3.5 text-white/40 hover:text-white/60" />
       )}
     </button>
   );

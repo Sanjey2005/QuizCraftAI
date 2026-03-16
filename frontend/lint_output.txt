@@ -1,0 +1,300 @@
+
+> frontend@0.1.0 lint
+> eslint
+
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\(auth)\login\page.tsx
+  116:14  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\attempts\[id]\results\page.tsx
+  112:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\classrooms\[id]\page.tsx
+   92:9   warning  'toggle' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+  223:12  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\classrooms\[id]\page.tsx:223:12
+  221 |   useEffect(() => {
+  222 |     const u = getStoredUser();
+> 223 |     if (u) setUserRole(u.role);
+      |            ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  224 |   }, []);
+  225 |
+  226 |   const { data: classroom, isLoading } = useQuery<ClassroomDetail>({  react-hooks/set-state-in-effect
+  280:72  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react/no-unescaped-entities
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\classrooms\page.tsx
+    6:8   warning  'Link' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  159:20  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  232:12  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\classrooms\page.tsx:232:12
+  230 |   useEffect(() => {
+  231 |     const u = getStoredUser();
+> 232 |     if (u) setRole(u.role);
+      |            ^^^^^^^ Avoid calling setState() directly within an effect
+  233 |   }, []);
+  234 |
+  235 |   const isInstructor = role === "instructor";  react-hooks/set-state-in-effect
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\dashboard\instructor\page.tsx
+  9:18  warning  'AnimatePresence' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\dashboard\student\page.tsx
+   78:20  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+  157:55  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\dashboard\student\page.tsx:157:55
+  155 |   const [joinModalOpen, setJoinModalOpen] = useState(false);
+  156 |
+> 157 |   useEffect(() => { const u = getStoredUser(); if (u) setUsername(u.username); }, []);
+      |                                                       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  158 |
+  159 |   const { data, isLoading } = useQuery<StudentAnalytics>({
+  160 |     queryKey: ["student-analytics"],  react-hooks/set-state-in-effect
+  187:9   warning  'quizzesLoading' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  222:85  warning  'idx' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  379:45  warning  'qIdx' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  434:79  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react/no-unescaped-entities
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\page.tsx
+  198:24  warning  'index' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\quizzes\[id]\attempt\page.tsx
+   56:27  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\quizzes\[id]\attempt\page.tsx:56:27
+  54 | ) {
+  55 |   const [remaining, setRemaining] = useState(totalSeconds ?? 0);
+> 56 |   const startRef = useRef(Date.now());
+     |                           ^^^^^^^^^^ Cannot call impure function
+  57 |   const expiredRef = useRef(false);
+  58 |   const onExpireRef = useRef(onExpire);
+  59 |   useEffect(() => { onExpireRef.current = onExpire; }, [onExpire]);  react-hooks/purity
+  166:43  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\quizzes\[id]\attempt\page.tsx:166:43
+  164 |
+  165 |   const attemptIdRef = useRef<string | null>(null);
+> 166 |   const questionStartRef = useRef<number>(Date.now());
+      |                                           ^^^^^^^^^^ Cannot call impure function
+  167 |   const tabSwitchCooldown = useRef(false);
+  168 |
+  169 |   useEffect(() => {                                                            react-hooks/purity
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\quizzes\[id]\edit\page.tsx
+    6:21   warning  'Save' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+    6:136  warning  'ShieldCheck' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  175:27   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\quizzes\[id]\edit\page.tsx:175:27
+  173 |
+  174 |   useEffect(() => {
+> 175 |     if (fetchedQuestions) setQuestions(fetchedQuestions);
+      |                           ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  176 |   }, [fetchedQuestions]);
+  177 |
+  178 |   useEffect(() => {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/set-state-in-effect
+  181:5    error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\quizzes\[id]\edit\page.tsx:181:5
+  179 |     if (!quiz) return;
+  180 |     const toLocalDatetimeInput = (iso: string | null) => iso ? new Date(iso).toISOString().slice(0, 16) : "";
+> 181 |     setForm({ title: quiz.title, description: quiz.description || "", timeLimitMinutes: quiz.time_limit_seconds ? String(Math.round(quiz.time_limit_seconds / 60)) : "", maxAttempts: String(quiz.max_attempts), shuffleQuestions: quiz.shuffle_questions, shuffleOptions: quiz.shuffle_options, perQuestionTimer: quiz.per_question_timer, availableFrom: toLocalDatetimeInput(quiz.available_from), availableUntil: toLocalDatetimeInput(quiz.available_until) });
+      |     ^^^^^^^ Avoid calling setState() directly within an effect
+  182 |   }, [quiz?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  183 |
+  184 |   const invalidate = () => { queryClient.invalidateQueries({ queryKey: ["quiz", id] }); queryClient.invalidateQueries({ queryKey: ["my-quizzes"] }); };  react-hooks/set-state-in-effect
+  270:206  warning  'i' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\quizzes\generate\page.tsx
+  11:31  warning  'Pickaxe' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\quizzes\page.tsx
+  67:5  error  Error: Cannot reassign variable after render completes
+
+Reassigning `debounceTimer` after render has completed can cause inconsistent behavior on subsequent renders. Consider using state instead.
+
+C:\Users\acer\Desktop\quizcraftai\frontend\app\quizzes\page.tsx:67:5
+  65 |     setSearch(e.target.value);
+  66 |     clearTimeout(debounceTimer);
+> 67 |     debounceTimer = setTimeout(() => setDebouncedSearch(e.target.value), 400);
+     |     ^^^^^^^^^^^^^ Cannot reassign `debounceTimer` after render completes
+  68 |   };
+  69 |
+  70 |   return (  react-hooks/immutability
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\layout\Navbar.tsx
+  29:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\layout\Navbar.tsx:29:5
+  27 |
+  28 |   useEffect(() => {
+> 29 |     setUser(getStoredUser());
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  30 |   }, []);
+  31 |
+  32 |   const handleLogout = () => {  react-hooks/set-state-in-effect
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\layout\Sidebar.tsx
+  46:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\layout\Sidebar.tsx:46:5
+  44 |
+  45 |   useEffect(() => {
+> 46 |     setUser(getStoredUser());
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  47 |   }, []);
+  48 |
+  49 |   // Close mobile menu on route change                                           react-hooks/set-state-in-effect
+  51:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\layout\Sidebar.tsx:51:5
+  49 |   // Close mobile menu on route change
+  50 |   useEffect(() => {
+> 51 |     setMobileOpen(false);
+     |     ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  52 |   }, [pathname]);
+  53 |
+  54 |   const handleLogout = () => {  react-hooks/set-state-in-effect
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\quiz\TimerBar.tsx
+  13:35  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\quiz\TimerBar.tsx:13:35
+  11 |   const barRef = useRef<HTMLDivElement>(null);
+  12 |   const [pct, setPct] = useState(100);
+> 13 |   const startRef = useRef<number>(Date.now());
+     |                                   ^^^^^^^^^^ Cannot call impure function
+  14 |   const onExpireRef = useRef(onExpire);
+  15 |
+  16 |   useEffect(() => {  react-hooks/purity
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\ui\app-sidebar.tsx
+  42:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\ui\app-sidebar.tsx:42:5
+  40 |
+  41 |   useEffect(() => {
+> 42 |     setUser(getStoredUser());
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  43 |   }, []);
+  44 |
+  45 |   const handleLogout = async () => {  react-hooks/set-state-in-effect
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\ui\custom-cursor.tsx
+  20:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\ui\custom-cursor.tsx:20:5
+  18 |     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+  19 |     
+> 20 |     setIsVisible(true);
+     |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  21 |     document.body.classList.add("custom-cursor-active");
+  22 |
+  23 |     const updateMousePosition = (e: MouseEvent) => {  react-hooks/set-state-in-effect
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\ui\multi-step-loader.tsx
+  21:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\components\ui\multi-step-loader.tsx:21:7
+  19 |   useEffect(() => {
+  20 |     if (status === "completed" || status === "failed") {
+> 21 |       setCurrentStep(generationSteps.length);
+     |       ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  22 |       return;
+  23 |     }
+  24 |  react-hooks/set-state-in-effect
+
+C:\Users\acer\Desktop\quizcraftai\frontend\lib\hooks.ts
+  60:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\acer\Desktop\quizcraftai\frontend\lib\hooks.ts:60:5
+  58 |
+  59 |   useEffect(() => {
+> 60 |     setUser(getStoredUser());
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  61 |     setLoading(false);
+  62 |   }, []);
+  63 |  react-hooks/set-state-in-effect
+
+Γ£û 33 problems (22 errors, 11 warnings)
+

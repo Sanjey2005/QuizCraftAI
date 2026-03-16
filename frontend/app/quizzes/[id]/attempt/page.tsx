@@ -294,13 +294,13 @@ export default function QuizAttemptPage({
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-border/50 flex items-center justify-center mx-auto mb-6 shadow-2xl">
+          <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-white/30 flex items-center justify-center mx-auto mb-6 shadow-2xl">
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
           </div>
           <p className="text-primary font-medium text-lg">
             {phase === "creating" ? "Initializing environment..." : "Loading questions..."}
           </p>
-          <p className="text-muted text-sm mt-2 font-mono">Stand by</p>
+          <p className="text-white/60 text-sm mt-2 font-mono">Stand by</p>
         </div>
       </div>
     );
@@ -315,7 +315,7 @@ export default function QuizAttemptPage({
             <AlertTriangle className="w-8 h-8 text-danger" />
           </div>
           <p className="text-primary font-bold text-xl mb-2">Something went wrong</p>
-          <p className="text-secondary text-sm mb-8">{errorMsg}</p>
+          <p className="text-white/80 text-sm mb-8">{errorMsg}</p>
           <button
             onClick={() => router.push("/quizzes")}
             className="w-full py-3.5 rounded-xl text-sm font-semibold text-black bg-white transition-all hover:bg-white/90"
@@ -366,12 +366,12 @@ export default function QuizAttemptPage({
       </AnimatePresence>
 
       {/* ── Top Header ── */}
-      <header className="bg-surface border-b border-border/50 sticky top-0 z-20 shadow-sm">
+      <header className="bg-surface-2 border-b border-white/30 sticky top-0 z-20 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Quiz title */}
             <div className="flex items-center gap-4 min-w-0">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-surface-2 border border-border/50 flex-shrink-0 font-mono font-bold text-white">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-surface-2 border border-white/30 flex-shrink-0 font-mono font-bold text-white">
                 Q
               </div>
               <h1 className="font-semibold tracking-tight text-white text-sm md:text-base truncate max-w-[150px] md:max-w-xs">
@@ -381,16 +381,16 @@ export default function QuizAttemptPage({
 
             {/* Timers & Counters */}
             <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
-              <span className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-2 border border-border/50 text-secondary font-mono tracking-widest uppercase">
-                {String(currentQuestionIndex + 1).padStart(2, '0')} <span className="text-muted/50">/</span> {String(questions.length).padStart(2, '0')}
+              <span className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-2 border border-white/30 text-white/80 font-mono tracking-widest uppercase">
+                {String(currentQuestionIndex + 1).padStart(2, '0')} <span className="text-white/60/50">/</span> {String(questions.length).padStart(2, '0')}
               </span>
-              <span className="md:hidden text-xs font-mono font-bold text-secondary">{currentQuestionIndex + 1}/{questions.length}</span>
+              <span className="md:hidden text-xs font-mono font-bold text-white/80">{currentQuestionIndex + 1}/{questions.length}</span>
 
               {attemptInfo?.time_limit_seconds != null && (
                 <div
                   className={cn(
                      "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold tracking-widest tabular-nums border",
-                     timer.pct > 30 ? "bg-surface-2 border-border/50 text-white" : timer.pct > 10 ? "bg-warning/10 border-warning/30 text-warning" : "bg-danger/10 border-danger/30 text-danger animate-pulse"
+                     timer.pct > 30 ? "bg-surface-2 border-white/30 text-white" : timer.pct > 10 ? "bg-warning/10 border-warning/30 text-warning" : "bg-danger/10 border-danger/30 text-danger animate-pulse"
                   )}
                 >
                   <Clock className="w-3.5 h-3.5" />
@@ -423,7 +423,7 @@ export default function QuizAttemptPage({
                   exit="exit"
                   className="w-full"
                >
-                 <div className="bg-surface-2 border border-border/50 rounded-2xl shadow-2xl p-6 md:p-10 lg:p-12 relative overflow-hidden">
+                 <div className="bg-surface-2 border border-white/30 rounded-2xl shadow-2xl p-6 md:p-10 lg:p-12 relative overflow-hidden">
                    {/* Background Gradient Glow */}
                    <div className="absolute -top-[100px] -right-[100px] w-64 h-64 bg-white/5 blur-3xl rounded-full pointer-events-none" />
 
@@ -447,7 +447,7 @@ export default function QuizAttemptPage({
                    {/* Metadata */}
                    <div className="flex items-center gap-3 mb-6">
                      {question.topic_tag && (
-                       <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] uppercase tracking-widest font-bold bg-background text-muted border border-border/50">
+                       <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] uppercase tracking-widest font-bold bg-background text-white/60 border border-white/30">
                          {question.topic_tag}
                        </span>
                      )}
@@ -496,18 +496,18 @@ export default function QuizAttemptPage({
              />
            ))}
          </div>
-         <p className="text-center text-xs text-muted/50 font-mono tracking-widest mt-4 uppercase">
+         <p className="text-center text-xs text-white/60/50 font-mono tracking-widest mt-4 uppercase">
            {answeredCount} / {questions.length} Answered
          </p>
       </main>
 
       {/* ── Bottom Navigation Bar ── */}
-      <div className="bg-surface border-t border-border/50 sticky bottom-0 z-20">
+      <div className="bg-surface-2 border-t border-white/30 sticky bottom-0 z-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <button
             onClick={() => goToQuestion(currentQuestionIndex - 1)}
             disabled={isFirst || phase === "finishing"}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-secondary transition-colors disabled:opacity-20 disabled:cursor-not-allowed hover:bg-surface-2 hover:text-white"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white/80 transition-colors disabled:opacity-20 disabled:cursor-not-allowed hover:bg-surface-2 hover:text-white"
           >
             <ChevronLeft className="w-5 h-5" />
             <span className="hidden sm:inline">Previous</span>
@@ -532,7 +532,7 @@ export default function QuizAttemptPage({
             <button
                onClick={() => goToQuestion(currentQuestionIndex + 1)}
                disabled={phase === "finishing"}
-               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-surface-2 hover:text-white border border-border/50 hover:border-white/10"
+               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-surface-2 hover:text-white border border-white/30 hover:border-white/10"
              >
                <span className="hidden sm:inline">Next</span>
                <span className="sm:hidden">Next</span>

@@ -44,20 +44,20 @@ export default function QuizDetailPage({ params }: { params: Promise<{ id: strin
 
   return (
     <PageWrapper className="max-w-3xl mx-auto">
-      <Link href="/quizzes" className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-600 transition-colors mb-6">
+      <Link href="/quizzes" className="inline-flex items-center gap-1.5 text-sm text-white/40 hover:text-white/80 transition-colors mb-6">
         <ArrowLeft className="w-4 h-4" /> Back to Quizzes
       </Link>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8">
+      <div className="bg-[#1A1A1A] rounded-2xl border border-white/30 shadow-sm p-8">
         <div className="flex flex-wrap gap-2 mb-4">
-          <span className="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-600 rounded-full text-xs font-medium">{quiz.topic}</span>
+          <span className="px-2.5 py-1 bg-background border border-white/30 text-white/80 rounded-full text-xs font-medium">{quiz.topic}</span>
           <span className={cn("px-2.5 py-1 rounded-full text-xs font-semibold border capitalize", DIFFICULTY_STYLES[quiz.difficulty])}>{quiz.difficulty}</span>
         </div>
 
-        <h1 className="text-2xl font-bold text-slate-900 mb-3">{quiz.title}</h1>
-        {quiz.description && <p className="text-slate-500 text-sm mb-6 leading-relaxed">{quiz.description}</p>}
+        <h1 className="text-2xl font-bold text-white mb-3">{quiz.title}</h1>
+        {quiz.description && <p className="text-white/60 text-sm mb-6 leading-relaxed">{quiz.description}</p>}
 
-        <div className="flex flex-wrap gap-5 mb-8 text-sm text-slate-500">
+        <div className="flex flex-wrap gap-5 mb-8 text-sm text-white/60">
           {quiz.time_limit_seconds && (
             <div className="flex items-center gap-1.5"><Clock className="w-4 h-4" />{Math.round(quiz.time_limit_seconds / 60)} min limit</div>
           )}

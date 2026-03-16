@@ -104,13 +104,13 @@ export function MultiStepLoader({ status }: { status: "pending" | "generating" |
                 ) : isActive ? (
                   <Loader2 className="w-5 h-5 text-white animate-spin" />
                 ) : (
-                  <div className="w-2 h-2 rounded-full bg-border" />
+                  <div className="w-2 h-2 rounded-full bg-white/20" />
                 )}
               </div>
               <span className={cn(
                 "text-sm font-medium transition-colors duration-300",
-                isPast ? "text-muted" : 
-                isActive ? "text-white" : "text-muted/50"
+                isPast ? "text-white/70" : 
+                isActive ? "text-white" : "text-white/30"
               )}>
                 {step.text}
               </span>

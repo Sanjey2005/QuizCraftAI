@@ -110,18 +110,18 @@ export default function GenerateQuizPage() {
   return (
     <PageWrapper className="max-w-2xl mx-auto">
       <div className="mb-10 text-center">
-        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="w-16 h-16 rounded-2xl bg-surface-2 border border-border/50 mx-auto flex items-center justify-center mb-6">
+        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="w-16 h-16 rounded-2xl bg-surface-2 border border-white/30 mx-auto flex items-center justify-center mb-6">
           <Brain className="w-8 h-8 text-primary" />
         </motion.div>
         <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-3xl md:text-5xl font-semibold tracking-tight text-primary mb-3">
           Generate a Quiz
         </motion.h1>
-        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-secondary">
+        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-white/80">
           Describe your topic or upload a document and let AI do the rest
         </motion.p>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-surface rounded-2xl border border-border/50 shadow-2xl overflow-hidden relative">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-surface-2 rounded-2xl border border-white/30 shadow-2xl overflow-hidden relative">
         {/* Animated background glow */}
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
@@ -130,7 +130,7 @@ export default function GenerateQuizPage() {
             <form onSubmit={handleSubmit} className="space-y-10">
               {/* Step 1: Topic */}
               <div className="relative">
-                <div className="absolute -left-[45px] top-1 w-8 h-8 rounded-full bg-surface-2 border border-border/50 flex items-center justify-center text-xs font-mono text-secondary hidden md:flex">01</div>
+                <div className="absolute -left-[45px] top-1 w-8 h-8 rounded-full bg-surface-2 border border-white/30 flex items-center justify-center text-xs font-mono text-white/80 hidden md:flex">01</div>
                 <div>
                   <label className="block text-base font-medium text-primary mb-3">What is the topic?</label>
                   <input
@@ -139,19 +139,19 @@ export default function GenerateQuizPage() {
                     onChange={(e) => setTopic(e.target.value)}
                     required
                     placeholder="e.g. Photosynthesis, World War II, Python loops..."
-                    className="w-full px-5 py-4 rounded-xl text-base text-primary placeholder:text-muted bg-surface-2 border border-border/50 outline-none transition-all focus:border-white/20 focus:bg-background shadow-inner"
+                    className="w-full px-5 py-4 rounded-xl text-base text-primary placeholder:text-white/60 bg-surface-2 border border-white/30 outline-none transition-all focus:border-white/20 focus:bg-background shadow-inner"
                   />
                 </div>
               </div>
 
               {/* Step 2: Settings */}
               <div className="relative">
-                <div className="absolute -left-[45px] top-1 w-8 h-8 rounded-full bg-surface-2 border border-border/50 flex items-center justify-center text-xs font-mono text-secondary hidden md:flex">02</div>
+                <div className="absolute -left-[45px] top-1 w-8 h-8 rounded-full bg-surface-2 border border-white/30 flex items-center justify-center text-xs font-mono text-white/80 hidden md:flex">02</div>
                 <div className="space-y-8">
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <label className="text-base font-medium text-primary">Number of questions</label>
-                      <span className="text-sm font-mono bg-surface-2 px-3 py-1 rounded-md border border-border/50 text-white">{numQuestions}</span>
+                      <span className="text-sm font-mono bg-surface-2 px-3 py-1 rounded-md border border-white/30 text-white">{numQuestions}</span>
                     </div>
                     <input
                       type="range"
@@ -161,7 +161,7 @@ export default function GenerateQuizPage() {
                       onChange={(e) => setNumQuestions(Number(e.target.value))}
                       className="w-full accent-white bg-surface-2 h-2 rounded-full appearance-none outline-none focus:ring-2 focus:ring-white/20"
                     />
-                    <div className="flex justify-between text-xs text-muted mt-2 font-mono">
+                    <div className="flex justify-between text-xs text-white/60 mt-2 font-mono">
                       <span>1</span><span>50</span>
                     </div>
                   </div>
@@ -178,7 +178,7 @@ export default function GenerateQuizPage() {
                             "py-3 text-sm font-medium rounded-xl transition-all capitalize border",
                             difficulty === d
                               ? "bg-white text-black border-transparent shadow-[0_0_20px_rgba(255,255,255,0.1)]"
-                              : "bg-surface-2 text-secondary border-border/50 hover:text-white hover:border-white/10"
+                              : "bg-surface-2 text-white/80 border-white/30 hover:text-white hover:border-white/10"
                           )}
                         >
                           {d}
@@ -191,10 +191,10 @@ export default function GenerateQuizPage() {
 
               {/* Step 3: Source Material */}
               <div className="relative">
-                <div className="absolute -left-[45px] top-1 w-8 h-8 rounded-full bg-surface-2 border border-border/50 flex items-center justify-center text-xs font-mono text-secondary hidden md:flex">03</div>
+                <div className="absolute -left-[45px] top-1 w-8 h-8 rounded-full bg-surface-2 border border-white/30 flex items-center justify-center text-xs font-mono text-white/80 hidden md:flex">03</div>
                 <div>
                   <label className="block text-base font-medium text-primary mb-3">
-                    Upload source material <span className="text-muted font-normal">(optional)</span>
+                    Upload source material <span className="text-white/60 font-normal">(optional)</span>
                   </label>
 
                   {!file ? (
@@ -203,7 +203,7 @@ export default function GenerateQuizPage() {
                         "relative rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden",
                         dragging
                           ? "border-white bg-white/5"
-                          : "border-border hover:border-white/30 hover:bg-surface-2"
+                          : "border-white/30 hover:border-white/30 hover:bg-surface-2"
                       )}
                       onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
                       onDragLeave={() => setDragging(false)}
@@ -212,13 +212,13 @@ export default function GenerateQuizPage() {
                     >
                       <div className="absolute inset-x-0 h-full w-full bg-gradient-to-b from-transparent to-surface-2 opacity-50 pointer-events-none" />
                       <div className="flex flex-col items-center justify-center py-12 px-4 relative z-10">
-                        <div className="w-12 h-12 rounded-full bg-surface border border-border/50 flex items-center justify-center mb-4">
-                          <Upload className={cn("w-5 h-5 transition-colors", dragging ? "text-white" : "text-muted")} />
+                        <div className="w-12 h-12 rounded-full bg-surface-2 border border-white/30 flex items-center justify-center mb-4">
+                          <Upload className={cn("w-5 h-5 transition-colors", dragging ? "text-white" : "text-white/60")} />
                         </div>
-                        <p className="text-base text-secondary text-center mb-1">
+                        <p className="text-base text-white/80 text-center mb-1">
                           <span className="text-white font-medium">Click to upload</span> or drag and drop
                         </p>
-                        <p className="text-xs text-muted">PDF or DOCX, max 5MB</p>
+                        <p className="text-xs text-white/60">PDF or DOCX, max 5MB</p>
                       </div>
                       <input
                         ref={fileInputRef}
@@ -229,18 +229,18 @@ export default function GenerateQuizPage() {
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center gap-4 px-5 py-4 rounded-xl bg-surface-2 border border-border/50 group hover:border-white/10 transition-colors">
-                      <div className="w-10 h-10 rounded-lg bg-background border border-border/50 flex items-center justify-center flex-shrink-0">
+                    <div className="flex items-center gap-4 px-5 py-4 rounded-xl bg-surface-2 border border-white/30 group hover:border-white/10 transition-colors">
+                      <div className="w-10 h-10 rounded-lg bg-background border border-white/30 flex items-center justify-center flex-shrink-0">
                          <FileBox className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-primary font-medium truncate group-hover:text-white transition-colors">{file.name}</p>
-                        <p className="text-xs text-muted mt-0.5">{formatFileSize(file.size)}</p>
+                        <p className="text-xs text-white/60 mt-0.5">{formatFileSize(file.size)}</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => { setFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
-                        className="p-2 rounded-lg text-muted hover:text-danger hover:bg-danger/10 transition-all ml-4"
+                        className="p-2 rounded-lg text-white/60 hover:text-danger hover:bg-danger/10 transition-all ml-4"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -281,8 +281,8 @@ export default function GenerateQuizPage() {
                >
                 <div className="text-center">
                   <h2 className="text-xl font-medium text-primary mb-2">Generating your quiz</h2>
-                  <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-muted">
-                    <span className="text-white bg-surface-2 px-2 py-0.5 rounded border border-border/50 truncate max-w-[200px]">{topic}</span>
+                  <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-white/60">
+                    <span className="text-white bg-surface-2 px-2 py-0.5 rounded border border-white/30 truncate max-w-[200px]">{topic}</span>
                     <span>·</span>
                     <span className="font-mono">{numQuestions}q</span>
                     <span>·</span>
@@ -290,7 +290,7 @@ export default function GenerateQuizPage() {
                     {file && (
                       <>
                         <span>·</span>
-                        <span className="text-secondary flex items-center gap-1"><FileText className="w-3 h-3"/> {file.name}</span>
+                        <span className="text-white/80 flex items-center gap-1"><FileText className="w-3 h-3"/> {file.name}</span>
                       </>
                     )}
                   </div>

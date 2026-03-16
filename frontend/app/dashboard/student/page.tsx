@@ -109,25 +109,25 @@ function JoinClassroomModal({ open, onClose }: { open: boolean; onClose: () => v
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="relative w-full max-w-sm rounded-xl p-6 bg-surface border border-border/50 shadow-2xl"
+            className="relative w-full max-w-sm rounded-xl p-6 bg-surface-2 border border-white/30 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-primary">Join Classroom</h3>
-              <button onClick={handleClose} className="p-1.5 rounded-lg text-muted hover:text-primary hover:bg-surface-2 transition-all">
+              <button onClick={handleClose} className="p-1.5 rounded-lg text-white/60 hover:text-primary hover:bg-surface-2 transition-all">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-secondary mb-2">Classroom Code</label>
+                <label className="block text-sm font-medium text-white/80 mb-2">Classroom Code</label>
                 <input
                   type="text"
                   value={code}
                   onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 6))}
                   placeholder="e.g. ABC123"
                   maxLength={6}
-                  className="w-full px-4 py-3 rounded-lg text-center text-2xl font-black tracking-[0.3em] font-mono text-primary placeholder:text-muted outline-none border border-border bg-surface-2 focus:ring-1 focus:ring-white/20 focus:border-white/20 transition-all uppercase"
+                  className="w-full px-4 py-3 rounded-lg text-center text-2xl font-black tracking-[0.3em] font-mono text-primary placeholder:text-white/60 outline-none border border-white/30 bg-surface-2 focus:ring-1 focus:ring-white/20 focus:border-white/20 transition-all uppercase"
                   autoFocus
                 />
               </div>
@@ -190,14 +190,14 @@ export default function StudentDashboardPage() {
     <PageWrapper>
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
         <div>
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-secondary mb-4 font-mono uppercase tracking-wider">
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs text-white/80 mb-4 font-mono uppercase tracking-wider">
             <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
             Student Dashboard
           </motion.div>
           <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-3xl md:text-5xl font-semibold tracking-tight text-primary mb-2">
             Welcome back{username ? `, ${username}` : ""}
           </motion.h1>
-          <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-secondary">
+          <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-white/80">
             Your learning progress at a glance
           </motion.p>
         </div>
@@ -220,25 +220,25 @@ export default function StudentDashboardPage() {
 
       <motion.div variants={staggerContainer} initial="hidden" animate="show" className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {stats.map(({ icon: Icon, label, value, gradient, iconColor, borderColor }, idx) => (
-          <motion.div key={label} variants={fadeUp} className={cn("rounded-xl p-5 bg-surface border border-border/50 transition-all hover:bg-surface-2 relative overflow-hidden group", borderColor)}>
+          <motion.div key={label} variants={fadeUp} className={cn("rounded-xl p-5 bg-surface-2 border border-white/30 transition-all hover:bg-surface-2 relative overflow-hidden group", borderColor)}>
             <div className={cn("absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500", gradient)} />
             <div className="relative z-10">
-              <div className="w-10 h-10 rounded-lg bg-surface-2 border border-border flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-lg bg-surface-2 border border-white/30 flex items-center justify-center mb-4">
                 <Icon className={cn("w-5 h-5", iconColor)} />
               </div>
               {isLoading ? (
-                <div className="h-8 w-16 bg-surface-2 border border-border/50 rounded animate-pulse mb-1" />
+                <div className="h-8 w-16 bg-surface-2 border border-white/30 rounded animate-pulse mb-1" />
               ) : (
                 <p className="text-2xl font-bold text-primary tracking-tight">{value}</p>
               )}
-              <p className="text-xs font-medium text-secondary mt-1">{label}</p>
+              <p className="text-xs font-medium text-white/80 mt-1">{label}</p>
             </div>
           </motion.div>
         ))}
       </motion.div>
 
       {/* Tab Switcher */}
-      <div className="flex items-center gap-2 mb-8 p-1 rounded-lg w-fit bg-surface-2 border border-border/50">
+      <div className="flex items-center gap-2 mb-8 p-1 rounded-lg w-fit bg-surface-2 border border-white/30">
         {(["overview", "quizzes", "classrooms"] as const).map((tab) => {
            const icons = { overview: BarChart2, quizzes: BookOpen, classrooms: School };
            const Icon = icons[tab];
@@ -250,7 +250,7 @@ export default function StudentDashboardPage() {
                   "px-4 py-2 rounded-md text-sm transition-all flex items-center gap-2 capitalize",
                   activeTab === tab 
                     ? "bg-white text-black font-medium shadow-sm" 
-                    : "text-secondary hover:text-primary hover:bg-surface"
+                    : "text-white/80 hover:text-primary hover:bg-surface-2"
                 )}
               >
                 <Icon className="w-4 h-4" />
@@ -264,20 +264,20 @@ export default function StudentDashboardPage() {
       <AnimatePresence mode="wait">
       {activeTab === "overview" && (
         <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: 0.2 }}
-          className="rounded-xl overflow-hidden bg-surface border border-border/50">
-          <div className="flex items-center justify-between px-6 py-5 border-b border-border/50">
+          className="rounded-xl overflow-hidden bg-surface-2 border border-white/30">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-white/30">
             <h2 className="font-medium text-primary text-lg">Recent Attempts</h2>
-            <Link href="/analytics/me" className="text-xs font-medium text-muted hover:text-primary transition-colors flex items-center gap-1">View all <ArrowRight className="w-3 h-3"/></Link>
+            <Link href="/analytics/me" className="text-xs font-medium text-white/60 hover:text-primary transition-colors flex items-center gap-1">View all <ArrowRight className="w-3 h-3"/></Link>
           </div>
           {isLoading ? (
             <div className="p-6 space-y-4">{[0,1,2].map((i) => <div key={i} className="flex gap-4 animate-pulse"><div className="h-12 bg-surface-2 rounded-lg flex-1" /><div className="h-12 w-16 bg-surface-2 rounded-lg" /></div>)}</div>
           ) : !data?.score_trend?.length ? (
             <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-              <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-border flex items-center justify-center mb-4">
-                 <Activity className="w-8 h-8 text-muted" />
+              <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-white/30 flex items-center justify-center mb-4">
+                 <Activity className="w-8 h-8 text-white/60" />
               </div>
               <p className="text-primary font-medium mb-2">No attempts yet</p>
-              <p className="text-secondary text-sm mb-6">Join a classroom and start taking quizzes to see your progress.</p>
+              <p className="text-white/80 text-sm mb-6">Join a classroom and start taking quizzes to see your progress.</p>
               <Button onClick={() => setJoinModalOpen(true)} className="gap-2">
                 Join Classroom
               </Button>
@@ -290,11 +290,11 @@ export default function StudentDashboardPage() {
                     className="flex items-center gap-4 px-6 py-4 group hover:bg-surface-2 transition-colors">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-primary truncate group-hover:text-white transition-colors">{item.quiz_title}</p>
-                      <p className="text-xs text-muted mt-1">{new Date(item.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</p>
+                      <p className="text-xs text-white/60 mt-1">{new Date(item.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</p>
                     </div>
                     <div className="flex flex-col items-end">
                       <span className="text-lg font-bold font-mono tabular-nums" style={{ color: scoreColor(item.score) }}>{Math.round(item.score)}%</span>
-                      <span className="text-[10px] items-center text-muted flex gap-1 group-hover:text-secondary opacity-0 group-hover:opacity-100 transition-opacity">View Results <ArrowRight className="w-3 h-3"/></span>
+                      <span className="text-[10px] items-center text-white/60 flex gap-1 group-hover:text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">View Results <ArrowRight className="w-3 h-3"/></span>
                     </div>
                   </Link>
                 </motion.div>
@@ -310,8 +310,8 @@ export default function StudentDashboardPage() {
           {classroomsLoading ? (
             <div className="space-y-6">
               {[0, 1].map((i) => (
-                <div key={i} className="rounded-xl overflow-hidden bg-surface border border-border/50">
-                   <div className="h-14 px-6 flex items-center border-b border-border/50">
+                <div key={i} className="rounded-xl overflow-hidden bg-surface-2 border border-white/30">
+                   <div className="h-14 px-6 flex items-center border-b border-white/30">
                      <div className="h-5 bg-surface-2 rounded w-1/3 animate-pulse" />
                    </div>
                    <div className="p-4 space-y-2">
@@ -321,13 +321,13 @@ export default function StudentDashboardPage() {
               ))}
             </div>
           ) : classrooms.length === 0 ? (
-            <div className="rounded-xl bg-surface border border-border/50">
+            <div className="rounded-xl bg-surface-2 border border-white/30">
               <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-                <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-border/50 flex items-center justify-center mb-6">
-                  <BookOpen className="w-8 h-8 text-secondary" />
+                <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-white/30 flex items-center justify-center mb-6">
+                  <BookOpen className="w-8 h-8 text-white/80" />
                 </div>
                 <h3 className="text-xl font-medium text-primary mb-2">Join a classroom</h3>
-                <p className="text-secondary text-sm mb-6 max-w-sm">Your instructor will assign quizzes to your classroom. Ask them for a join code.</p>
+                <p className="text-white/80 text-sm mb-6 max-w-sm">Your instructor will assign quizzes to your classroom. Ask them for a join code.</p>
                 <Button onClick={() => setJoinModalOpen(true)} className="gap-2">
                   Join Classroom
                 </Button>
@@ -346,22 +346,22 @@ export default function StudentDashboardPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.05 + cIdx * 0.05 }}
-                    className="rounded-xl bg-surface border border-border/50 overflow-hidden"
+                    className="rounded-xl bg-surface-2 border border-white/30 overflow-hidden"
                   >
                     <div
-                      className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-surface-2 transition-colors border-b border-border/50 group"
+                      className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-surface-2 transition-colors border-b border-white/30 group"
                       onClick={() => router.push(`/classrooms/${classroom.id}`)}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-surface-2 border border-border/50 flex items-center justify-center group-hover:border-white/20 transition-colors">
-                          <School className="w-5 h-5 text-secondary group-hover:text-primary transition-colors" />
+                        <div className="w-10 h-10 rounded-lg bg-surface-2 border border-white/30 flex items-center justify-center group-hover:border-white/20 transition-colors">
+                          <School className="w-5 h-5 text-white/80 group-hover:text-primary transition-colors" />
                         </div>
                         <div>
                           <p className="font-medium text-primary group-hover:text-white transition-colors">{classroom.name}</p>
-                          <p className="text-xs text-muted">by {classroom.teacher_username}</p>
+                          <p className="text-xs text-white/60">by {classroom.teacher_username}</p>
                         </div>
                       </div>
-                      <span className="text-xs text-muted bg-surface-2 px-2.5 py-1 rounded-full border border-border/50 group-hover:border-white/10 transition-colors">
+                      <span className="text-xs text-white/60 bg-surface-2 px-2.5 py-1 rounded-full border border-white/30 group-hover:border-white/10 transition-colors">
                          {loading ? "..." : quizzes.length} quiz{quizzes.length !== 1 ? "zes" : ""}
                       </span>
                     </div>
@@ -372,12 +372,12 @@ export default function StudentDashboardPage() {
                       </div>
                     ) : quizzes.length === 0 ? (
                       <div className="py-10 text-center px-4 bg-background/50">
-                        <p className="text-muted text-sm border border-dashed border-border/50 inline-block px-4 py-2 rounded-lg">No quizzes assigned yet</p>
+                        <p className="text-white/60 text-sm border border-dashed border-white/30 inline-block px-4 py-2 rounded-lg">No quizzes assigned yet</p>
                       </div>
                     ) : (
                       <div className="divide-y divide-border/50 bg-background/30">
                         {quizzes.map((quiz, qIdx) => {
-                          const dc = DIFFICULTY_COLORS[quiz.difficulty] ?? { bg: "bg-surface-2 border-border/50", text: "text-muted" };
+                          const dc = DIFFICULTY_COLORS[quiz.difficulty] ?? { bg: "bg-surface-2 border-white/30", text: "text-white/60" };
                           return (
                             <div
                               key={quiz.id}
@@ -385,13 +385,13 @@ export default function StudentDashboardPage() {
                             >
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-primary truncate group-hover/quiz:text-white transition-colors">{quiz.title}</p>
-                                <p className="text-xs text-muted mt-1 truncate">{quiz.topic}</p>
+                                <p className="text-xs text-white/60 mt-1 truncate">{quiz.topic}</p>
                               </div>
                               <span className={cn("px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider flex-shrink-0", dc.bg, dc.text)}>
                                 {quiz.difficulty}
                               </span>
                               {quiz.question_count != null && (
-                                <span className="text-xs font-mono text-secondary flex-shrink-0 hidden sm:block border border-border/50 px-2 py-0.5 rounded bg-surface-2">
+                                <span className="text-xs font-mono text-white/80 flex-shrink-0 hidden sm:block border border-white/30 px-2 py-0.5 rounded bg-surface-2">
                                   {quiz.question_count}q
                                 </span>
                               )}
@@ -421,17 +421,17 @@ export default function StudentDashboardPage() {
           {classroomsLoading ? (
             <div className="grid gap-4 md:grid-cols-2">
               {[0, 1, 2].map((i) => (
-                <div key={i} className="rounded-xl h-28 bg-surface border border-border/50 animate-pulse" />
+                <div key={i} className="rounded-xl h-28 bg-surface-2 border border-white/30 animate-pulse" />
               ))}
             </div>
           ) : classrooms.length === 0 ? (
-             <div className="rounded-xl bg-surface border border-border/50">
+             <div className="rounded-xl bg-surface-2 border border-white/30">
                <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-                 <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-border/50 flex items-center justify-center mb-6">
-                   <School className="w-8 h-8 text-secondary" />
+                 <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-white/30 flex items-center justify-center mb-6">
+                   <School className="w-8 h-8 text-white/80" />
                  </div>
                  <h3 className="text-xl font-medium text-primary mb-2">No classrooms</h3>
-                 <p className="text-secondary text-sm mb-6 max-w-sm">You haven't joined any classrooms yet. Ask your instructor for a code.</p>
+                 <p className="text-white/80 text-sm mb-6 max-w-sm">You haven't joined any classrooms yet. Ask your instructor for a code.</p>
                  <Button onClick={() => setJoinModalOpen(true)} className="gap-2">
                    Join Classroom
                  </Button>
@@ -445,14 +445,14 @@ export default function StudentDashboardPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.05 + idx * 0.05 }}
-                  className="rounded-xl bg-surface border border-border/50 p-6 cursor-pointer group transition-all hover:bg-surface-2 hover:border-white/10"
+                  className="rounded-xl bg-surface-2 border border-white/30 p-6 cursor-pointer group transition-all hover:bg-surface-2 hover:border-white/10"
                   onClick={() => router.push(`/classrooms/${classroom.id}`)}
                 >
                   <div className="flex items-start justify-between mb-4">
-                     <div className="w-12 h-12 rounded-xl bg-surface-2 border border-border/50 flex items-center justify-center group-hover:border-white/20 transition-colors">
-                        <School className="w-6 h-6 text-secondary group-hover:text-primary transition-colors" />
+                     <div className="w-12 h-12 rounded-xl bg-surface-2 border border-white/30 flex items-center justify-center group-hover:border-white/20 transition-colors">
+                        <School className="w-6 h-6 text-white/80 group-hover:text-primary transition-colors" />
                      </div>
-                     <span className="text-xs text-muted font-mono bg-background px-2 py-1 rounded border border-border/50">
+                     <span className="text-xs text-white/60 font-mono bg-background px-2 py-1 rounded border border-white/30">
                         {new Date(classroom.created_at).getFullYear()}
                      </span>
                   </div>
@@ -460,12 +460,12 @@ export default function StudentDashboardPage() {
                     {classroom.name}
                   </h3>
                   {classroom.description ? (
-                     <p className="text-sm text-secondary truncate mb-4">{classroom.description}</p>
+                     <p className="text-sm text-white/80 truncate mb-4">{classroom.description}</p>
                   ) : (
                      <div className="mb-4" />
                   )}
                   
-                  <div className="flex items-center gap-4 text-xs text-muted border-t border-border/50 pt-4">
+                  <div className="flex items-center gap-4 text-xs text-white/60 border-t border-white/30 pt-4">
                     <span className="flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5" />
                       {classroom.member_count} member{classroom.member_count !== 1 ? "s" : ""}

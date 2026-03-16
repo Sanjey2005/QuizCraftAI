@@ -64,7 +64,7 @@ export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: st
    <div className="min-h-screen bg-background flex items-center justify-center">
      <div className="text-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
-        <p className="text-secondary font-mono text-xs uppercase tracking-widest">Loading Analytics</p>
+        <p className="text-white/80 font-mono text-xs uppercase tracking-widest">Loading Analytics</p>
      </div>
    </div>
   );
@@ -73,7 +73,7 @@ export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: st
    <div className="min-h-screen bg-background flex items-center justify-center p-4">
      <div className="bg-surface-2 rounded-2xl shadow-2xl border border-danger/20 p-8 text-center max-w-sm w-full mx-auto">
        <p className="text-primary font-bold text-xl mb-2">Could not load analytics</p>
-       <p className="text-secondary text-sm mb-8">Data unavailable or quiz deleted.</p>
+       <p className="text-white/80 text-sm mb-8">Data unavailable or quiz deleted.</p>
        <Link href="/dashboard/instructor" className="text-sm border-b border-primary/30 pb-0.5 text-primary hover:text-white transition-colors">
           Back to Dashboard
        </Link>
@@ -84,29 +84,29 @@ export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: st
   return (
     <div className="min-h-screen bg-background">
       <PageWrapper className="max-w-5xl mx-auto py-10 md:py-16">
-        <Link href="/dashboard/instructor" className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-muted hover:text-primary transition-colors mb-8">
+        <Link href="/dashboard/instructor" className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-white/60 hover:text-primary transition-colors mb-8">
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </Link>
 
         {/* Header */}
         <div className="mb-10">
-          <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-2 flex items-center gap-2">
+          <p className="text-xs font-mono uppercase tracking-widest text-white/80 mb-2 flex items-center gap-2">
              <TrendingUp className="w-3.5 h-3.5" /> Analytics Overview
           </p>
           <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-white">{data.quiz_title}</h1>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 p-1.5 rounded-xl mb-10 w-fit bg-surface-2 border border-border/50 shadow-inner overflow-x-auto max-w-full">
+        <div className="flex gap-2 p-1.5 rounded-xl mb-10 w-fit bg-surface-2 border border-white/30 shadow-inner overflow-x-auto max-w-full">
           {[{ id: "overview", label: "Overview" }, { id: "leaderboard", label: "Leaderboard" }].map(({ id: tid, label }) => (
             <button key={tid} onClick={() => setTab(tid as "overview" | "leaderboard")}
               className={cn(
                 "px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 relative",
                 tab === tid
-                  ? "text-white bg-white/10 shadow-sm border border-white/5"
-                  : "text-muted hover:text-primary hover:bg-white/5"
+                  ? "text-white bg-[#1A1A1A]/10 shadow-sm border border-white/5"
+                  : "text-white/60 hover:text-primary hover:bg-[#1A1A1A]/5"
               )}>
-              {tab === tid && <motion.div layoutId="analyticstab" className="absolute inset-0 bg-white/5 rounded-lg border border-white/10" />}
+              {tab === tid && <motion.div layoutId="analyticstab" className="absolute inset-0 bg-[#1A1A1A]/5 rounded-lg border border-white/10" />}
               <span className="relative z-10">{label}</span>
             </button>
           ))}
@@ -127,7 +127,7 @@ export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: st
                 return (
                   <div
                     key={label}
-                    className="rounded-2xl p-6 bg-surface-2 border border-border/50 shadow-md relative overflow-hidden group hover:bg-surface transition-colors"
+                    className="rounded-2xl p-6 bg-surface-2 border border-white/30 shadow-md relative overflow-hidden group hover:bg-surface-2 transition-colors"
                   >
                      <div className="absolute top-0 right-0 w-24 h-24 blur-3xl rounded-full opacity-20 pointer-events-none transition-opacity group-hover:opacity-40" style={{ backgroundColor: s.iconColor }} />
                     <div
@@ -137,7 +137,7 @@ export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: st
                       <Icon className="w-5 h-5" style={{ color: s.iconColor }} />
                     </div>
                     <p className="text-3xl font-black tracking-tight text-white mb-1 font-mono">{value}</p>
-                    <p className="text-xs uppercase tracking-widest text-muted font-semibold">{label}</p>
+                    <p className="text-xs uppercase tracking-widest text-white/60 font-semibold">{label}</p>
                   </div>
                 );
               })}
@@ -145,7 +145,7 @@ export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: st
 
             {/* Topic Breakdown */}
             {data.topic_breakdown && Object.keys(data.topic_breakdown).length > 0 && (
-              <div className="rounded-2xl p-6 md:p-8 bg-surface-2 border border-border/50 shadow-md">
+              <div className="rounded-2xl p-6 md:p-8 bg-surface-2 border border-white/30 shadow-md">
                 <h2 className="text-base font-semibold text-white mb-6">Topic Breakdown</h2>
                 <div className="overflow-x-auto pb-4">
                   <TopicBreakdownChart topicBreakdown={data.topic_breakdown} />
@@ -155,10 +155,10 @@ export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: st
 
             {/* Empty State */}
             {data.total_attempts === 0 && (
-              <div className="rounded-2xl p-16 text-center bg-surface-2 border border-border/50 shadow-md flex flex-col items-center">
-                 <Users className="w-10 h-10 text-muted/30 mb-4" />
-                <p className="text-sm font-medium text-secondary">No attempts yet</p>
-                <p className="text-xs text-muted mt-2 max-w-xs mx-auto">Share the quiz with students to start gathering analytics data.</p>
+              <div className="rounded-2xl p-16 text-center bg-surface-2 border border-white/30 shadow-md flex flex-col items-center">
+                 <Users className="w-10 h-10 text-white/60/30 mb-4" />
+                <p className="text-sm font-medium text-white/80">No attempts yet</p>
+                <p className="text-xs text-white/60 mt-2 max-w-xs mx-auto">Share the quiz with students to start gathering analytics data.</p>
               </div>
             )}
           </motion.div>
@@ -171,9 +171,9 @@ export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: st
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
           ) : !lbData?.leaderboard?.length ? (
-            <div className="rounded-2xl p-16 text-center bg-surface-2 border border-border/50 shadow-md flex flex-col items-center">
-              <Medal className="w-12 h-12 mb-4 text-muted/30" />
-              <p className="font-medium text-secondary">No recorded scores yet</p>
+            <div className="rounded-2xl p-16 text-center bg-surface-2 border border-white/30 shadow-md flex flex-col items-center">
+              <Medal className="w-12 h-12 mb-4 text-white/60/30" />
+              <p className="font-medium text-white/80">No recorded scores yet</p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -193,16 +193,16 @@ export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: st
                         transition={{ delay: e.rank * 0.1 }}
                         className={cn("flex flex-col items-center p-6 md:p-8 rounded-2xl border relative overflow-hidden", s?.bg, s?.border, s?.shadow)}
                      >
-                      <div className="absolute top-0 right-0 w-32 h-32 blur-3xl bg-white/5 pointer-events-none" />
+                      <div className="absolute top-0 right-0 w-32 h-32 blur-3xl bg-[#1A1A1A]/5 pointer-events-none" />
                       
                       <div className="relative z-10 text-center">
                          <div className={cn("inline-flex items-center justify-center w-12 h-12 rounded-full border border-white/10 bg-black/20 shadow-inner mb-4", s?.text)}>
                             <Medal className="w-6 h-6" />
                          </div>
                          <p className="font-bold text-base text-white truncate max-w-[150px]">{e.display_name}</p>
-                         <p className="text-xs mb-3 text-muted">@{e.username}</p>
+                         <p className="text-xs mb-3 text-white/60">@{e.username}</p>
                          <p className={cn("text-4xl font-black font-mono tracking-tighter", s?.text)}>{Math.round(e.score)}%</p>
-                         <p className="text-xs mt-3 flex items-center justify-center gap-1.5 text-secondary uppercase tracking-widest font-mono">
+                         <p className="text-xs mt-3 flex items-center justify-center gap-1.5 text-white/80 uppercase tracking-widest font-mono">
                             <Clock className="w-3.5 h-3.5" /> {fmt(e.time_spent_seconds)}
                          </p>
                       </div>
@@ -213,24 +213,24 @@ export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: st
 
               {/* Other Rankings */}
               {lbData.leaderboard.length > 3 && (
-                <div className="rounded-2xl overflow-hidden bg-surface-2 border border-border/50 shadow-md">
-                  <div className="px-6 py-4 border-b border-border/50 bg-background/50">
-                    <span className="text-xs font-semibold uppercase tracking-widest text-secondary">Other Placements</span>
+                <div className="rounded-2xl overflow-hidden bg-surface-2 border border-white/30 shadow-md">
+                  <div className="px-6 py-4 border-b border-white/30 bg-background/50">
+                    <span className="text-xs font-semibold uppercase tracking-widest text-white/80">Other Placements</span>
                   </div>
                   <div className="divide-y divide-border/50">
                      {lbData.leaderboard.slice(3).map((e) => (
-                     <div key={e.rank} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 px-6 py-4 hover:bg-surface transition-colors group">
+                     <div key={e.rank} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 px-6 py-4 hover:bg-surface-2 transition-colors group">
                         <div className="flex items-center gap-4 flex-1 min-w-0">
-                           <span className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-background border border-border/50 text-xs font-mono font-bold text-secondary group-hover:text-primary transition-colors">
+                           <span className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-background border border-white/30 text-xs font-mono font-bold text-white/80 group-hover:text-primary transition-colors">
                               {e.rank}
                            </span>
                            <div className="flex-1 min-w-0">
                               <p className="font-semibold text-sm text-primary truncate leading-tight">{e.display_name}</p>
-                              <p className="text-xs text-muted">@{e.username}</p>
+                              <p className="text-xs text-white/60">@{e.username}</p>
                            </div>
                         </div>
                         <div className="flex items-center justify-between sm:justify-end gap-6 sm:w-auto mt-2 sm:mt-0 ml-12 sm:ml-0">
-                           <p className="text-xs flex items-center gap-1.5 text-secondary font-mono tracking-wide">
+                           <p className="text-xs flex items-center gap-1.5 text-white/80 font-mono tracking-wide">
                               <Clock className="w-3.5 h-3.5" />{fmt(e.time_spent_seconds)}
                            </p>
                            <p className="w-16 text-right font-mono font-bold text-base text-white">{Math.round(e.score)}%</p>

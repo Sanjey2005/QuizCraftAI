@@ -43,7 +43,7 @@ export default function LoginPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="w-full max-w-[420px] bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 relative z-10 shadow-2xl"
+        className="w-full max-w-[420px] bg-[#1A1A1A] border border-white/30 rounded-2xl p-8 relative z-10 shadow-2xl"
       >
         <div className="flex flex-col items-center mb-8">
           <Link href="/" className="w-12 h-12 rounded bg-white flex items-center justify-center mb-6">
@@ -52,40 +52,40 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold tracking-tight text-white mb-2" style={{ letterSpacing: "-0.02em" }}>
             Welcome back
           </h1>
-          <p className="text-[#A0A0A0] text-sm text-center">
+          <p className="text-white/80 text-sm text-center">
             Sign in to your QuizCraft AI account to continue.
           </p>
         </div>
 
         <form onSubmit={(e) => { e.preventDefault(); setErrorMsg(""); loginMutation.mutate({ username, password }); }} className="space-y-5">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#A0A0A0]">Username</label>
+            <label className="text-sm font-medium text-white/80">Username</label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
               autoFocus
-              className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white text-sm outline-none transition-all placeholder:text-[#555555] focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
+              className="w-full px-4 py-3 bg-[#1A1A1A] border border-white/30 rounded-lg text-white text-sm outline-none transition-all placeholder:text-white/60 focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
               placeholder="Enter your username"
             />
           </div>
 
           <div className="space-y-2 relative">
-            <label className="text-sm font-medium text-[#A0A0A0]">Password</label>
+            <label className="text-sm font-medium text-white/80">Password</label>
             <div className="relative">
               <input
                 type={showPwd ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white text-sm outline-none transition-all pr-12 placeholder:text-[#555555] focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
+                className="w-full px-4 py-3 bg-[#1A1A1A] border border-white/30 rounded-lg text-white text-sm outline-none transition-all pr-12 placeholder:text-white/60 focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
                 placeholder="Enter your password"
               />
               <button
                 type="button"
                 onClick={() => setShowPwd(!showPwd)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#555555] hover:text-[#A0A0A0] transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/80 transition-colors"
               >
                 {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -112,7 +112,7 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <div className="mt-8 text-center text-sm text-[#555555]">
+        <div className="mt-8 text-center text-sm text-white/60">
           Don't have an account?{" "}
           <Link href="/register" className="text-white hover:underline underline-offset-4 transition-all">
             Sign up

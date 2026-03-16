@@ -62,7 +62,7 @@ export default function RegisterPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="w-full max-w-[480px] bg-[#111111] border border-[#2A2A2A] rounded-2xl p-8 relative z-10 shadow-2xl my-8"
+        className="w-full max-w-[480px] bg-[#1A1A1A] border border-white/30 rounded-2xl p-8 relative z-10 shadow-2xl my-8"
       >
         <div className="flex flex-col items-center mb-8">
           <Link href="/" className="w-12 h-12 rounded bg-white flex items-center justify-center mb-6">
@@ -71,7 +71,7 @@ export default function RegisterPage() {
           <h1 className="text-2xl font-bold tracking-tight text-white mb-2" style={{ letterSpacing: "-0.02em" }}>
             Create an account
           </h1>
-          <p className="text-[#A0A0A0] text-sm text-center">
+          <p className="text-white/80 text-sm text-center">
             Join QuizCraft AI and transform your learning experience.
           </p>
         </div>
@@ -86,13 +86,13 @@ export default function RegisterPage() {
               className={`py-4 px-4 rounded-xl border text-left transition-all relative overflow-hidden group
                 ${form.role === value 
                   ? "border-white bg-[#1A1A1A]" 
-                  : "border-[#2A2A2A] bg-transparent hover:border-[#555555] hover:bg-[#1A1A1A]"
+                  : "border-white/30 bg-transparent hover:border-white/40 hover:bg-[#1A1A1A]"
                 }`}
             >
               <div className="relative z-10">
-                <Icon className={`w-5 h-5 mb-3 transition-colors ${form.role === value ? "text-white" : "text-[#555555] group-hover:text-[#A0A0A0]"}`} />
-                <p className={`text-sm font-semibold transition-colors ${form.role === value ? "text-white" : "text-[#A0A0A0]"}`}>{label}</p>
-                <p className={`text-xs mt-1 transition-colors ${form.role === value ? "text-[#A0A0A0]" : "text-[#555555]"}`}>{desc}</p>
+                <Icon className={`w-5 h-5 mb-3 transition-colors ${form.role === value ? "text-white" : "text-white/60 group-hover:text-white/80"}`} />
+                <p className={`text-sm font-semibold transition-colors ${form.role === value ? "text-white" : "text-white/80"}`}>{label}</p>
+                <p className={`text-xs mt-1 transition-colors ${form.role === value ? "text-white/80" : "text-white/60"}`}>{desc}</p>
               </div>
             </button>
           ))}
@@ -103,45 +103,45 @@ export default function RegisterPage() {
           className="space-y-4"
         >
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#A0A0A0]">Username</label>
+            <label className="text-sm font-medium text-white/80">Username</label>
             <input 
               type="text" 
               value={form.username} 
               onChange={set("username")} 
               required 
               autoFocus
-              className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white text-sm outline-none transition-all placeholder:text-[#555555] focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
+              className="w-full px-4 py-3 bg-[#1A1A1A] border border-white/30 rounded-lg text-white text-sm outline-none transition-all placeholder:text-white/60 focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
               placeholder="coolteacher42" 
             />
           </div>
           
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#A0A0A0]">Email</label>
+            <label className="text-sm font-medium text-white/80">Email</label>
             <input 
               type="email" 
               value={form.email} 
               onChange={set("email")} 
               required
-              className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white text-sm outline-none transition-all placeholder:text-[#555555] focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
+              className="w-full px-4 py-3 bg-[#1A1A1A] border border-white/30 rounded-lg text-white text-sm outline-none transition-all placeholder:text-white/60 focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
               placeholder="you@university.edu" 
             />
           </div>
           
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#A0A0A0]">Password</label>
+            <label className="text-sm font-medium text-white/80">Password</label>
             <div className="relative">
               <input 
                 type={showPwd ? "text" : "password"} 
                 value={form.password} 
                 onChange={set("password")} 
                 required
-                className="w-full px-4 py-3 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-white text-sm outline-none transition-all pr-12 placeholder:text-[#555555] focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
+                className="w-full px-4 py-3 bg-[#1A1A1A] border border-white/30 rounded-lg text-white text-sm outline-none transition-all pr-12 placeholder:text-white/60 focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
                 placeholder="min. 8 characters" 
               />
               <button 
                 type="button" 
                 onClick={() => setShowPwd(!showPwd)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#555555] hover:text-[#A0A0A0] transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/80 transition-colors"
                 tabIndex={-1}
               >
                 {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -166,7 +166,7 @@ export default function RegisterPage() {
           </Button>
         </form>
         
-        <div className="mt-8 text-center text-sm text-[#555555]">
+        <div className="mt-8 text-center text-sm text-white/60">
           Already have an account?{" "}
           <Link href="/login" className="text-white hover:underline underline-offset-4 transition-all">
             Sign in

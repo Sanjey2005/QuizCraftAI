@@ -1,11 +1,22 @@
 import uuid
 
 from django.db import models
+from django.utils import timezone
 
 from apps.users.models import User
 
 
+class QuizQuerySet(models.QuerySet):
+    def available_now(self):
+        now = timezone.now()
+        return (
+            self.filter(models.Q(available_from__isnull=True) | models.Q(available_from__lte=now))
+                .filter(models.Q(available_until__isnull=True) | models.Q(available_until__gte=now))
+        )
+
+
 class Quiz(models.Model):
+    objects = QuizQuerySet.as_manager()
     DIFFICULTY_CHOICES = [
         ("easy", "Easy"),
         ("medium", "Medium"),

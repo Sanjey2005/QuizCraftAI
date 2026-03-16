@@ -12,7 +12,10 @@
       "Bash(unzip:*)",
       "Bash(wc:*)",
       "Bash(curl:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(find:*)",
+      "Bash(npm install canvas-confetti)",
+      "Bash(npm install --save-dev @types/canvas-confetti)"
     ]
   }
 }

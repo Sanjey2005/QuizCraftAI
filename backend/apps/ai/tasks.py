@@ -22,6 +22,11 @@ def generate_quiz_task(self, quiz_id, topic, num_questions, difficulty, content=
     try:
         result = call_nim(topic, num_questions, difficulty, content)
 
+        if not result.questions:
+            quiz.generation_status = "failed"
+            quiz.save(update_fields=["generation_status"])
+            return {"error": "Topic and PDF do not match. 0 questions generated."}
+
         # Validate: exactly 1 correct per question, no duplicate choices
         for i, q in enumerate(result.questions):
             correct_count = sum(1 for c in q.choices if c.is_correct)
@@ -31,9 +36,9 @@ def generate_quiz_task(self, quiz_id, topic, num_questions, difficulty, content=
             if len(set(texts)) < 4:
                 raise ValueError(f"Q{i+1} has duplicate choices")
 
-        # Bulk create questions and choices
-        for order, q in enumerate(result.questions):
-            question = Question.objects.create(
+        # Bulk create questions, then choices
+        question_objs = Question.objects.bulk_create([
+            Question(
                 quiz=quiz,
                 text=q.question_text,
                 explanation=q.explanation,
@@ -41,13 +46,18 @@ def generate_quiz_task(self, quiz_id, topic, num_questions, difficulty, content=
                 topic_tag=q.topic_tag,
                 difficulty_score=q.difficulty_score,
             )
-            for choice_order, c in enumerate(q.choices):
-                Choice.objects.create(
-                    question=question,
-                    text=c.text,
-                    is_correct=c.is_correct,
-                    order=choice_order,
-                )
+            for order, q in enumerate(result.questions)
+        ])
+        Choice.objects.bulk_create([
+            Choice(
+                question=question,
+                text=c.text,
+                is_correct=c.is_correct,
+                order=choice_order,
+            )
+            for question, q in zip(question_objs, result.questions)
+            for choice_order, c in enumerate(q.choices)
+        ])
 
         quiz.generation_status = "completed"
         if quiz.time_limit_seconds is None:

@@ -1,7 +1,6 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from django.db.models import Count, Q
-from django.utils import timezone
+from django.db.models import Count
 
 from .models import Classroom, ClassroomMembership
 from .serializers import (
@@ -77,8 +76,8 @@ class JoinClassroomView(generics.GenericAPIView):
             return Response({"detail": "Already a member."}, status=status.HTTP_400_BAD_REQUEST)
 
         ClassroomMembership.objects.create(classroom=classroom, student=request.user)
-        qs = Classroom.objects.filter(pk=classroom.pk).annotate(member_count=Count("memberships"))
-        return Response(ClassroomSerializer(qs.first()).data, status=status.HTTP_201_CREATED)
+        classroom = Classroom.objects.annotate(member_count=Count("memberships")).get(pk=classroom.pk)
+        return Response(ClassroomSerializer(classroom).data, status=status.HTTP_201_CREATED)
 
 
 class LeaveClassroomView(generics.GenericAPIView):
@@ -123,12 +122,7 @@ class ClassroomQuizzesView(generics.GenericAPIView):
 
         qs = classroom.quizzes.all()
         if not is_teacher:
-            now = timezone.now()
-            qs = qs.filter(is_published=True).filter(
-                Q(available_from__isnull=True) | Q(available_from__lte=now)
-            ).filter(
-                Q(available_until__isnull=True) | Q(available_until__gte=now)
-            )
+            qs = qs.filter(is_published=True).available_now()
 
         return Response(QuizSerializer(qs, many=True).data)
 
@@ -169,7 +163,7 @@ class RemoveQuizView(generics.GenericAPIView):
             return Response({"detail": "quiz_id required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            quiz = Quiz.objects.get(pk=quiz_id)
+            quiz = Quiz.objects.get(pk=quiz_id, creator=request.user)
         except Quiz.DoesNotExist:
             return Response({"detail": "Quiz not found."}, status=status.HTTP_404_NOT_FOUND)
 
