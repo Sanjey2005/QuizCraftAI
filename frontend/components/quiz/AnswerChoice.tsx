@@ -38,30 +38,33 @@ export function AnswerChoice({
       onClick={() => !disabled && onClick()}
       onKeyDown={handleKeyDown}
       className={cn(
-        "flex items-center gap-3 w-full min-h-[56px] px-4 py-3 rounded-xl border cursor-pointer transition-all duration-150 text-left select-none",
+        "flex items-center gap-4 w-full min-h-[64px] px-5 py-4 rounded-xl border cursor-pointer transition-all duration-200 text-left select-none group focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20",
         isDefault &&
-          "bg-white border-slate-200 hover:border-[var(--color-accent)] hover:bg-blue-50",
+          "bg-surface-2 border-border/50 hover:border-white/20 hover:bg-surface",
         selected &&
           !correct &&
           !incorrect &&
-          "bg-blue-50 border-[var(--color-accent)] border-2",
-        correct && "bg-green-50 border-green-500 border-2",
-        incorrect && "bg-red-50 border-red-500 border-2",
-        disabled && "opacity-60 cursor-not-allowed pointer-events-none"
+          "bg-white/10 border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.05)]",
+        correct && "bg-success/10 border-success/40",
+        incorrect && "bg-danger/10 border-danger/40",
+        disabled && "opacity-50 cursor-not-allowed pointer-events-none"
       )}
     >
       <span
         className={cn(
-          "flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors",
-          isDefault && "bg-slate-100 text-slate-500",
-          selected && !correct && !incorrect && "bg-[var(--color-accent)] text-white",
-          correct && "bg-green-500 text-white",
-          incorrect && "bg-red-500 text-white"
+          "flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold transition-colors border",
+          isDefault && "bg-background border-border/50 text-secondary group-hover:text-primary group-hover:border-white/20",
+          selected && !correct && !incorrect && "bg-white text-black border-transparent",
+          correct && "bg-success text-white border-transparent",
+          incorrect && "bg-danger text-white border-transparent"
         )}
       >
         {label}
       </span>
-      <span className="text-sm text-slate-800 flex-1 leading-relaxed">
+      <span className={cn(
+        "text-base flex-1 leading-relaxed transition-colors",
+        (selected || correct || incorrect) ? "text-white font-medium" : "text-primary/90 group-hover:text-white"
+      )}>
         {text}
       </span>
     </div>

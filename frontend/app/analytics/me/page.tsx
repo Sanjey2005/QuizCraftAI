@@ -16,7 +16,14 @@ interface StudentAnalytics {
   strongest_topic: string | null; weakest_topic: string | null;
 }
 
-const scoreColor = (s: number | null) => s == null ? "#2563eb" : s >= 70 ? "#10b981" : s >= 50 ? "#f59e0b" : "#f43f5e";
+const scoreColor = (s: number | null) => s == null ? "#2563eb" : s >= 70 ? "#16A34A" : s >= 50 ? "#D97706" : "#DC2626";
+
+const STAT_STYLES: { borderColor: string; iconBg: string; iconColor: string }[] = [
+  { borderColor: "#2563EB", iconBg: "#eff6ff", iconColor: "#2563EB" },
+  { borderColor: "#D97706", iconBg: "#fffbeb", iconColor: "#D97706" },
+  { borderColor: "#16A34A", iconBg: "#f0fdf4", iconColor: "#16A34A" },
+  { borderColor: "#DC2626", iconBg: "#fef2f2", iconColor: "#DC2626" },
+];
 
 export default function MyAnalyticsPage() {
   const { data, isLoading, isError } = useQuery<StudentAnalytics>({
@@ -34,101 +41,112 @@ export default function MyAnalyticsPage() {
   })();
 
   const stats = [
-    { label: "Total Attempts", value: String(data?.total_attempts ?? 0), icon: BookOpen, color: "from-blue-500 to-indigo-600", glow: "rgba(99,102,241,0.35)" },
-    { label: "Average Score", value: avg != null ? `${avg}%` : "—", icon: Target, color: "from-amber-500 to-orange-500", glow: "rgba(245,158,11,0.35)" },
-    { label: "Best Score", value: best != null ? `${best}%` : "—", icon: Trophy, color: "from-emerald-500 to-teal-600", glow: "rgba(16,185,129,0.35)" },
-    { label: "Lowest Score", value: worst != null ? `${worst}%` : "—", icon: TrendingDown, color: "from-rose-500 to-pink-600", glow: "rgba(244,63,94,0.35)" },
+    { label: "Total Attempts", value: String(data?.total_attempts ?? 0), icon: BookOpen },
+    { label: "Average Score", value: avg != null ? `${avg}%` : "--", icon: Target },
+    { label: "Best Score", value: best != null ? `${best}%` : "--", icon: Trophy },
+    { label: "Lowest Score", value: worst != null ? `${worst}%` : "--", icon: TrendingDown },
   ];
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--surface-900)" }}>
+    <div className="min-h-screen bg-[#F8FAFC]">
       <PageWrapper>
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white">My Analytics</h1>
-          <p className="text-white/35 text-sm mt-0.5">Your personal performance breakdown</p>
+          <h1 className="text-2xl font-bold" style={{ color: "#0F172A" }}>My Analytics</h1>
+          <p className="text-sm mt-0.5" style={{ color: "#64748B" }}>Your personal performance breakdown</p>
         </div>
 
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: "#2563EB", borderTopColor: "transparent" }} />
           </div>
         ) : isError ? (
           <div className="text-center py-20">
-            <Target className="w-12 h-12 text-white/15 mx-auto mb-4" />
-            <p className="text-rose-400 font-semibold mb-1">Could not load analytics</p>
-            <p className="text-white/35 text-sm mb-6">Please sign in and try again</p>
-            <Link href="/login" className="btn-primary">Sign In <ArrowRight className="w-4 h-4" /></Link>
+            <Target className="w-12 h-12 mx-auto mb-4" style={{ color: "#E2E8F0" }} />
+            <p className="font-semibold mb-1" style={{ color: "#DC2626" }}>Could not load analytics</p>
+            <p className="text-sm mb-6" style={{ color: "#64748B" }}>Please sign in and try again</p>
+            <Link href="/login" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white" style={{ background: "#2563EB" }}>Sign In <ArrowRight className="w-4 h-4" /></Link>
           </div>
         ) : !data || data.total_attempts === 0 ? (
           <div className="text-center py-20">
-            <BookOpen className="w-12 h-12 text-white/15 mx-auto mb-4" />
-            <p className="text-white font-semibold mb-1">No attempts yet</p>
-            <p className="text-white/35 text-sm mb-6">Take a quiz to see your analytics</p>
-            <Link href="/quizzes" className="btn-primary">Browse Quizzes <ArrowRight className="w-4 h-4" /></Link>
+            <BookOpen className="w-12 h-12 mx-auto mb-4" style={{ color: "#E2E8F0" }} />
+            <p className="font-semibold mb-1" style={{ color: "#0F172A" }}>No attempts yet</p>
+            <p className="text-sm mb-6" style={{ color: "#64748B" }}>Take a quiz to see your analytics</p>
+            <Link href="/quizzes" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white" style={{ background: "#2563EB" }}>Browse Quizzes <ArrowRight className="w-4 h-4" /></Link>
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Stat Cards */}
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {stats.map(({ label, value, icon: Icon, color, glow }) => (
-                <div key={label} className="rounded-2xl p-5 gradient-border" style={{ background: "var(--surface-800)" }}>
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-4`} style={{ boxShadow: `0 0 16px ${glow}` }}>
-                    <Icon className="w-5 h-5 text-white" />
+              {stats.map(({ label, value, icon: Icon }, idx) => {
+                const s = STAT_STYLES[idx];
+                return (
+                  <div
+                    key={label}
+                    className="rounded-xl p-5 bg-white border shadow-sm"
+                    style={{ borderColor: "#E2E8F0", borderLeftWidth: 4, borderLeftColor: s.borderColor }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center mb-4"
+                      style={{ background: s.iconBg }}
+                    >
+                      <Icon className="w-5 h-5" style={{ color: s.iconColor }} />
+                    </div>
+                    <p className="text-2xl font-black tracking-tight" style={{ color: "#0F172A" }}>{value}</p>
+                    <p className="text-xs font-medium mt-0.5" style={{ color: "#64748B" }}>{label}</p>
                   </div>
-                  <p className="text-2xl font-black text-white tracking-tight">{value}</p>
-                  <p className="text-xs font-medium text-white/35 mt-0.5">{label}</p>
-                </div>
-              ))}
+                );
+              })}
             </motion.div>
 
+            {/* Trend + Strongest/Weakest */}
             {(trend !== null || data.strongest_topic || data.weakest_topic) && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {trend !== null && (
-                  <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    {trend > 0 ? <TrendingUp className="w-8 h-8 text-emerald-400 shrink-0" /> : trend < 0 ? <TrendingDown className="w-8 h-8 text-rose-400 shrink-0" /> : <Minus className="w-8 h-8 text-white/20 shrink-0" />}
+                  <div className="rounded-xl p-5 flex items-center gap-4 bg-white border border-slate-200 shadow-sm">
+                    {trend > 0 ? <TrendingUp className="w-8 h-8 shrink-0" style={{ color: "#16A34A" }} /> : trend < 0 ? <TrendingDown className="w-8 h-8 shrink-0" style={{ color: "#DC2626" }} /> : <Minus className="w-8 h-8 text-slate-300 shrink-0" />}
                     <div>
-                      <p className="text-white/40 text-xs">vs Previous</p>
-                      <p className={`text-xl font-black ${trend > 0 ? "text-emerald-400" : trend < 0 ? "text-rose-400" : "text-white/30"}`}>{trend > 0 ? "+" : ""}{Math.round(trend)}%</p>
+                      <p className="text-xs" style={{ color: "#64748B" }}>vs Previous</p>
+                      <p className="text-xl font-black" style={{ color: trend > 0 ? "#16A34A" : trend < 0 ? "#DC2626" : "#64748B" }}>{trend > 0 ? "+" : ""}{Math.round(trend)}%</p>
                     </div>
                   </div>
                 )}
                 {data.strongest_topic && (
-                  <div className="rounded-2xl p-5" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <p className="text-white/40 text-xs mb-1">Strongest Topic</p>
-                    <p className="text-white font-bold text-sm capitalize">{data.strongest_topic}</p>
+                  <div className="rounded-xl p-5 bg-white border border-slate-200 shadow-sm">
+                    <p className="text-xs mb-1" style={{ color: "#64748B" }}>Strongest Topic</p>
+                    <p className="font-bold text-sm capitalize" style={{ color: "#0F172A" }}>{data.strongest_topic}</p>
                   </div>
                 )}
                 {data.weakest_topic && (
-                  <div className="rounded-2xl p-5" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <p className="text-white/40 text-xs mb-1">Needs Work</p>
-                    <p className="text-rose-400 font-bold text-sm capitalize">{data.weakest_topic}</p>
+                  <div className="rounded-xl p-5 bg-white border border-slate-200 shadow-sm">
+                    <p className="text-xs mb-1" style={{ color: "#64748B" }}>Needs Work</p>
+                    <p className="font-bold text-sm capitalize" style={{ color: "#DC2626" }}>{data.weakest_topic}</p>
                   </div>
                 )}
               </div>
             )}
 
+            {/* Topic Breakdown Chart */}
             {Object.keys(data.topic_breakdown).length > 0 && (
-              <div className="rounded-2xl p-6" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <h2 className="text-white font-bold mb-5">Topic Breakdown</h2>
+              <div className="rounded-xl p-6 bg-white border border-slate-200 shadow-sm">
+                <h2 className="font-bold mb-5" style={{ color: "#0F172A" }}>Topic Breakdown</h2>
                 <TopicBreakdownChart topicBreakdown={data.topic_breakdown} />
               </div>
             )}
 
+            {/* Score History */}
             {data.score_trend.length > 0 && (
-              <div className="rounded-2xl overflow-hidden" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <div className="px-6 py-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <h2 className="font-bold text-white">Score History <span className="text-white/30 font-normal text-sm">({data.score_trend.length} attempts)</span></h2>
+              <div className="rounded-xl overflow-hidden bg-white border border-slate-200 shadow-sm">
+                <div className="px-6 py-5 border-b border-slate-200">
+                  <h2 className="font-bold" style={{ color: "#0F172A" }}>Score History <span className="font-normal text-sm" style={{ color: "#64748B" }}>({data.score_trend.length} attempts)</span></h2>
                 </div>
                 <div>
                   {[...data.score_trend].reverse().slice(0, 20).map((item, i) => (
                     <Link key={item.attempt_id} href={`/attempts/${item.attempt_id}/results`}
-                      className="flex items-center gap-4 px-6 py-3.5 group transition-all"
-                      style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.02)"; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = ""; }}>
-                      <span className="text-white/20 text-xs font-mono w-5 shrink-0">{i + 1}</span>
+                      className="flex items-center gap-4 px-6 py-3.5 group transition-all border-b border-slate-100 hover:bg-slate-50">
+                      <span className="text-xs font-mono w-5 shrink-0" style={{ color: "#CBD5E1" }}>{i + 1}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white/80 truncate group-hover:text-blue-300 transition-colors">{item.quiz_title}</p>
-                        <p className="text-xs text-white/25">{new Date(item.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</p>
+                        <p className="text-sm truncate transition-colors" style={{ color: "#0F172A" }}>{item.quiz_title}</p>
+                        <p className="text-xs" style={{ color: "#94A3B8" }}>{new Date(item.date).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</p>
                       </div>
                       <span className="text-sm font-bold font-mono tabular-nums" style={{ color: scoreColor(item.score) }}>{Math.round(item.score)}%</span>
                     </Link>

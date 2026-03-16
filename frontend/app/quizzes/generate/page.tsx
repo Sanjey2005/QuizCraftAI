@@ -8,7 +8,9 @@ import { getStoredUser } from "@/lib/hooks";
 import { MultiStepLoader } from "@/components/ui/multi-step-loader";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { cn } from "@/lib/utils";
-import { Upload, X, FileText } from "lucide-react";
+import { Upload, X, FileText, Pickaxe, Brain, FileBox, RefreshCcw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
 interface StatusResponse {
   id: string;
@@ -106,179 +108,228 @@ export default function GenerateQuizPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--surface-900)" }}>
-      <PageWrapper className="max-w-lg mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-white mb-1">Generate a Quiz</h1>
-          <p className="text-white/40 text-sm">Describe your topic and let AI do the rest</p>
-        </div>
+    <PageWrapper className="max-w-2xl mx-auto">
+      <div className="mb-10 text-center">
+        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="w-16 h-16 rounded-2xl bg-surface-2 border border-border/50 mx-auto flex items-center justify-center mb-6">
+          <Brain className="w-8 h-8 text-primary" />
+        </motion.div>
+        <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-3xl md:text-5xl font-semibold tracking-tight text-primary mb-3">
+          Generate a Quiz
+        </motion.h1>
+        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-secondary">
+          Describe your topic or upload a document and let AI do the rest
+        </motion.p>
+      </div>
 
-        <div
-          className="rounded-2xl p-8 gradient-border"
-          style={{ background: "var(--surface-800)" }}
-        >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-surface rounded-2xl border border-border/50 shadow-2xl overflow-hidden relative">
+        {/* Animated background glow */}
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+        <div className="p-8 md:p-10">
           {!generatedQuizId ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-white/60 mb-2">Topic</label>
-                <input
-                  type="text"
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  required
-                  placeholder="e.g. Photosynthesis, World War II, Python loops..."
-                  className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/25 outline-none transition-all"
-                  style={{ background: "var(--surface-700)", border: "1px solid rgba(255,255,255,0.08)" }}
-                  onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; e.target.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.12)"; }}
-                  onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; e.target.style.boxShadow = "none"; }}
-                />
+            <form onSubmit={handleSubmit} className="space-y-10">
+              {/* Step 1: Topic */}
+              <div className="relative">
+                <div className="absolute -left-[45px] top-1 w-8 h-8 rounded-full bg-surface-2 border border-border/50 flex items-center justify-center text-xs font-mono text-secondary hidden md:flex">01</div>
+                <div>
+                  <label className="block text-base font-medium text-primary mb-3">What is the topic?</label>
+                  <input
+                    type="text"
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                    required
+                    placeholder="e.g. Photosynthesis, World War II, Python loops..."
+                    className="w-full px-5 py-4 rounded-xl text-base text-primary placeholder:text-muted bg-surface-2 border border-border/50 outline-none transition-all focus:border-white/20 focus:bg-background shadow-inner"
+                  />
+                </div>
               </div>
 
-              {/* File Upload */}
-              <div>
-                <label className="block text-sm font-semibold text-white/60 mb-2">
-                  Upload source material <span className="font-normal text-white/30">(optional)</span>
-                </label>
-
-                {!file ? (
-                  <div
-                    className={cn(
-                      "relative rounded-xl border-2 border-dashed transition-all cursor-pointer",
-                      dragging
-                        ? "border-blue-500/50 bg-blue-500/5"
-                        : "border-white/10 hover:border-white/20 hover:bg-white/[0.02]"
-                    )}
-                    onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-                    onDragLeave={() => setDragging(false)}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <div className="flex flex-col items-center justify-center py-8 px-4">
-                      <Upload className={cn("w-8 h-8 mb-3", dragging ? "text-blue-400" : "text-white/20")} />
-                      <p className="text-sm text-white/40 text-center">
-                        <span className="text-blue-400 font-medium">Click to upload</span> or drag and drop
-                      </p>
-                      <p className="text-xs text-white/20 mt-1">PDF or DOCX, max 5MB</p>
+              {/* Step 2: Settings */}
+              <div className="relative">
+                <div className="absolute -left-[45px] top-1 w-8 h-8 rounded-full bg-surface-2 border border-border/50 flex items-center justify-center text-xs font-mono text-secondary hidden md:flex">02</div>
+                <div className="space-y-8">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <label className="text-base font-medium text-primary">Number of questions</label>
+                      <span className="text-sm font-mono bg-surface-2 px-3 py-1 rounded-md border border-border/50 text-white">{numQuestions}</span>
                     </div>
                     <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".pdf,.docx"
-                      className="hidden"
-                      onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+                      type="range"
+                      min={1}
+                      max={50}
+                      value={numQuestions}
+                      onChange={(e) => setNumQuestions(Number(e.target.value))}
+                      className="w-full accent-white bg-surface-2 h-2 rounded-full appearance-none outline-none focus:ring-2 focus:ring-white/20"
                     />
-                  </div>
-                ) : (
-                  <div
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl"
-                    style={{ background: "var(--surface-700)", border: "1px solid rgba(255,255,255,0.08)" }}
-                  >
-                    <FileText className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white font-medium truncate">{file.name}</p>
-                      <p className="text-xs text-white/30">{formatFileSize(file.size)}</p>
+                    <div className="flex justify-between text-xs text-muted mt-2 font-mono">
+                      <span>1</span><span>50</span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => { setFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
-                      className="p-1.5 rounded-lg text-white/30 hover:text-rose-400 hover:bg-rose-500/10 transition-all"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
                   </div>
-                )}
 
-                {fileError && (
-                  <p className="text-xs text-rose-400 mt-2">{fileError}</p>
-                )}
-                <p className="text-xs text-white/20 mt-2">AI will generate questions based on your document</p>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-white/60">Number of questions</label>
-                  <span className="text-sm font-black font-mono text-blue-400">{numQuestions}</span>
-                </div>
-                <input
-                  type="range"
-                  min={1}
-                  max={50}
-                  value={numQuestions}
-                  onChange={(e) => setNumQuestions(Number(e.target.value))}
-                  className="w-full accent-blue-500"
-                />
-                <div className="flex justify-between text-xs text-white/25 mt-1">
-                  <span>1</span><span>50</span>
+                  <div>
+                    <label className="block text-base font-medium text-primary mb-3">Difficulty Level</label>
+                    <div className="grid grid-cols-3 gap-3">
+                      {(["easy", "medium", "hard"] as const).map((d) => (
+                        <button
+                          key={d}
+                          type="button"
+                          onClick={() => setDifficulty(d)}
+                          className={cn(
+                            "py-3 text-sm font-medium rounded-xl transition-all capitalize border",
+                            difficulty === d
+                              ? "bg-white text-black border-transparent shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                              : "bg-surface-2 text-secondary border-border/50 hover:text-white hover:border-white/10"
+                          )}
+                        >
+                          {d}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-white/60 mb-2">Difficulty</label>
-                <div className="flex rounded-xl p-1 gap-1" style={{ background: "var(--surface-700)" }}>
-                  {(["easy", "medium", "hard"] as const).map((d) => (
-                    <button
-                      key={d}
-                      type="button"
-                      onClick={() => setDifficulty(d)}
+              {/* Step 3: Source Material */}
+              <div className="relative">
+                <div className="absolute -left-[45px] top-1 w-8 h-8 rounded-full bg-surface-2 border border-border/50 flex items-center justify-center text-xs font-mono text-secondary hidden md:flex">03</div>
+                <div>
+                  <label className="block text-base font-medium text-primary mb-3">
+                    Upload source material <span className="text-muted font-normal">(optional)</span>
+                  </label>
+
+                  {!file ? (
+                    <div
                       className={cn(
-                        "flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all capitalize",
-                        difficulty === d
-                          ? "bg-white/10 text-white shadow-sm"
-                          : "text-white/35 hover:text-white/60"
+                        "relative rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden",
+                        dragging
+                          ? "border-white bg-white/5"
+                          : "border-border hover:border-white/30 hover:bg-surface-2"
                       )}
+                      onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+                      onDragLeave={() => setDragging(false)}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
                     >
-                      {d}
-                    </button>
-                  ))}
+                      <div className="absolute inset-x-0 h-full w-full bg-gradient-to-b from-transparent to-surface-2 opacity-50 pointer-events-none" />
+                      <div className="flex flex-col items-center justify-center py-12 px-4 relative z-10">
+                        <div className="w-12 h-12 rounded-full bg-surface border border-border/50 flex items-center justify-center mb-4">
+                          <Upload className={cn("w-5 h-5 transition-colors", dragging ? "text-white" : "text-muted")} />
+                        </div>
+                        <p className="text-base text-secondary text-center mb-1">
+                          <span className="text-white font-medium">Click to upload</span> or drag and drop
+                        </p>
+                        <p className="text-xs text-muted">PDF or DOCX, max 5MB</p>
+                      </div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf,.docx"
+                        className="hidden"
+                        onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-4 px-5 py-4 rounded-xl bg-surface-2 border border-border/50 group hover:border-white/10 transition-colors">
+                      <div className="w-10 h-10 rounded-lg bg-background border border-border/50 flex items-center justify-center flex-shrink-0">
+                         <FileBox className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-primary font-medium truncate group-hover:text-white transition-colors">{file.name}</p>
+                        <p className="text-xs text-muted mt-0.5">{formatFileSize(file.size)}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setFile(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                        className="p-2 rounded-lg text-muted hover:text-danger hover:bg-danger/10 transition-all ml-4"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+
+                  {fileError && (
+                    <p className="text-xs text-danger mt-3 flex items-center gap-1.5"><X className="w-3 h-3"/> {fileError}</p>
+                  )}
                 </div>
               </div>
 
               {generateMutation.isError && (
-                <p className="text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
-                  Generation failed. Please try again.
-                </p>
+                <div className="rounded-xl p-4 bg-danger/10 border border-danger/20 text-center">
+                   <p className="text-sm text-danger">Generation failed. Please try again.</p>
+                </div>
               )}
 
-              <button
-                type="submit"
-                disabled={generateMutation.isPending}
-                className="w-full btn-primary py-3.5 justify-center disabled:opacity-50"
-              >
-                {generateMutation.isPending ? "Submitting..." : "Generate Quiz ✦"}
-              </button>
+              <div className="pt-4">
+                <Button
+                  type="submit"
+                  disabled={generateMutation.isPending || !topic}
+                  className="w-full h-14 text-lg"
+                  variant="premium"
+                >
+                  {generateMutation.isPending ? "Connecting to AI..." : "Generate Quiz"}
+                </Button>
+              </div>
             </form>
           ) : (
-            <div className="space-y-6">
-              <div>
-                <h2 className="font-bold text-white mb-1">Generating your quiz</h2>
-                <p className="text-sm text-white/40">
-                  <span className="text-white/70 font-medium">{topic}</span> · {numQuestions} questions · {difficulty}
-                  {file && <span className="text-blue-400/60"> · from {file.name}</span>}
-                </p>
-              </div>
-              <div className="pt-2">
-                <MultiStepLoader status={currentStatus ?? "pending"} />
-              </div>
-              {currentStatus === "completed" && (
-                <button
-                  onClick={() => router.push(`/quizzes/${generatedQuizId}/edit`)}
-                  className="w-full btn-primary py-3.5 justify-center"
-                >
-                  Preview &amp; Publish →
-                </button>
-              )}
-              {currentStatus === "failed" && (
-                <button
-                  onClick={() => { setGeneratedQuizId(null); generateMutation.reset(); }}
-                  className="w-full py-2.5 text-sm font-semibold text-white/50 border border-white/10 rounded-xl hover:bg-white/5 transition-colors"
-                >
-                  Try Again
-                </button>
-              )}
-            </div>
+             <AnimatePresence mode="wait">
+              <motion.div 
+                key="generating"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="space-y-8 py-8"
+               >
+                <div className="text-center">
+                  <h2 className="text-xl font-medium text-primary mb-2">Generating your quiz</h2>
+                  <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-muted">
+                    <span className="text-white bg-surface-2 px-2 py-0.5 rounded border border-border/50 truncate max-w-[200px]">{topic}</span>
+                    <span>·</span>
+                    <span className="font-mono">{numQuestions}q</span>
+                    <span>·</span>
+                    <span className="capitalize">{difficulty}</span>
+                    {file && (
+                      <>
+                        <span>·</span>
+                        <span className="text-secondary flex items-center gap-1"><FileText className="w-3 h-3"/> {file.name}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="py-4">
+                  <MultiStepLoader status={currentStatus ?? "pending"} />
+                </div>
+                
+                <div className="flex flex-col gap-3">
+                  {currentStatus === "completed" && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                       <Button
+                          onClick={() => router.push(`/quizzes/${generatedQuizId}/edit`)}
+                          className="w-full h-14 text-lg"
+                          variant="premium"
+                        >
+                          Preview & Publish
+                       </Button>
+                    </motion.div>
+                  )}
+                  {currentStatus === "failed" && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                      <Button
+                        onClick={() => { setGeneratedQuizId(null); generateMutation.reset(); }}
+                        variant="outline"
+                        className="w-full h-14"
+                      >
+                        <RefreshCcw className="w-4 h-4 mr-2" />
+                        Try Again
+                      </Button>
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
           )}
         </div>
-      </PageWrapper>
-    </div>
+      </motion.div>
+    </PageWrapper>
   );
 }

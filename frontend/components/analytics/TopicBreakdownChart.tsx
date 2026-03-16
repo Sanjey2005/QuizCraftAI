@@ -17,9 +17,9 @@ interface TopicBreakdownChartProps {
 }
 
 function getBarColor(pct: number): string {
-  if (pct >= 80) return "#16a34a";
-  if (pct >= 50) return "#d97706";
-  return "#dc2626";
+  if (pct >= 80) return "#22c55e"; // success
+  if (pct >= 50) return "#eab308"; // warning
+  return "#ef4444"; // danger
 }
 
 interface ChartEntry {
@@ -40,10 +40,10 @@ const CustomTooltip = ({
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
-    <div className="bg-white border border-slate-200 rounded-lg px-3 py-2 shadow-lg">
-      <p className="font-medium text-slate-800 text-sm">{d.name}</p>
-      <p className="text-slate-500 text-xs mt-0.5">
-        {d.correct}/{d.total} correct · {d.percentage}%
+    <div className="bg-surface-2 border border-border/50 rounded-xl px-4 py-3 shadow-2xl backdrop-blur-md">
+      <p className="font-semibold text-primary text-sm mb-1">{d.name}</p>
+      <p className="text-secondary text-xs">
+        <span className="text-white font-mono">{d.correct}/{d.total}</span> correct · <span className="text-white font-mono">{d.percentage}%</span>
       </p>
     </div>
   );
@@ -60,10 +60,11 @@ const CustomLabel = (props: {
   if (!value) return null;
   return (
     <text
-      x={x + width + 8}
+      x={x + width + 12}
       y={y + height / 2}
-      fill="#64748b"
-      fontSize={11}
+      fill="#A0A0A0"
+      fontSize={12}
+      fontFamily="var(--font-mono)"
       dominantBaseline="middle"
     >
       {value}
@@ -90,42 +91,42 @@ export function TopicBreakdownChart({
 
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-32 text-slate-400 text-sm">
+      <div className="flex items-center justify-center h-32 text-muted text-sm font-mono">
         No topic data available
       </div>
     );
   }
 
-  const chartHeight = Math.max(300, data.length * 52);
+  const chartHeight = Math.max(300, data.length * 56);
 
   return (
     <ResponsiveContainer width="100%" height={chartHeight}>
       <BarChart
         data={data}
         layout="vertical"
-        margin={{ top: 4, right: 110, left: 8, bottom: 4 }}
+        margin={{ top: 10, right: 120, left: 10, bottom: 10 }}
       >
-        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#2A2A2A" />
         <XAxis
           type="number"
           domain={[0, 100]}
           tickFormatter={(v: number) => `${v}%`}
           axisLine={false}
           tickLine={false}
-          tick={{ fontSize: 11, fill: "#94a3b8" }}
+          tick={{ fontSize: 12, fill: "#555555", fontFamily: "var(--font-mono)" }}
         />
         <YAxis
           type="category"
           dataKey="name"
-          width={120}
+          width={130}
           axisLine={false}
           tickLine={false}
-          tick={{ fontSize: 12, fill: "#475569" }}
+          tick={{ fontSize: 13, fill: "#A0A0A0", fontWeight: 500 }}
         />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: "#f8fafc" }} />
-        <Bar dataKey="percentage" maxBarSize={28} radius={4}>
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)", radius: 6 }} />
+        <Bar dataKey="percentage" maxBarSize={32} radius={6}>
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={getBarColor(entry.percentage)} />
+            <Cell key={`cell-${index}`} fill={getBarColor(entry.percentage)} style={{ filter: `drop-shadow(0 0 10px ${getBarColor(entry.percentage)}80)` }} />
           ))}
           <LabelList dataKey="label" content={<CustomLabel />} />
         </Bar>

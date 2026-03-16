@@ -8,7 +8,7 @@ export function PageWrapper({
   className?: string;
 }) {
   return (
-    <div className={cn("max-w-[1200px] mx-auto px-6 pt-8 pb-12", className)}>
+    <div className={cn("max-w-[1200px] mx-auto px-8 py-8", className)}>
       {children}
     </div>
   );

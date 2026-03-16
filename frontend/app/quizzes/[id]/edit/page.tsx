@@ -3,9 +3,12 @@
 import { use, useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { ArrowLeft, Save, Eye, CheckCircle2, Loader2, BookOpen, Clock, Users, Globe, Lock, RefreshCw, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, Save, Eye, CheckCircle2, Loader2, BookOpen, Clock, Users, Globe, Lock, RefreshCw, CheckCircle, XCircle, Settings2, ShieldCheck, HelpCircle, AlertCircle } from "lucide-react";
 import { api } from "@/lib/api";
 import { PageWrapper } from "@/components/layout/PageWrapper";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface Quiz {
   id: string; title: string; description: string; topic: string; difficulty: string;
@@ -35,16 +38,19 @@ function Toggle({ checked, onChange, disabled }: { checked: boolean; onChange: (
     <button type="button" role="switch" aria-checked={checked} disabled={disabled}
       onClick={() => onChange(!checked)}
       className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-      style={{ background: checked ? "#2563EB" : "rgba(255,255,255,0.12)" }}>
-      <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${checked ? "translate-x-5" : "translate-x-0"}`} />
+      style={{ background: checked ? "#22C55E" : "#3A3A3A" }}>
+      <span className={`inline-block h-5 w-5 transform rounded-full shadow ring-0 transition duration-200 ease-in-out ${checked ? "translate-x-5 bg-black" : "translate-x-0 bg-white"}`} />
     </button>
   );
 }
 
 function SettingRow({ label, description, children }: { label: string; description?: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-      <div><p className="text-sm font-medium text-white/80">{label}</p>{description && <p className="text-xs text-white/30 mt-0.5">{description}</p>}</div>
+    <div className="flex items-center justify-between gap-6 py-4 border-b border-border/50 last:border-0">
+      <div>
+        <p className="text-sm font-medium text-primary">{label}</p>
+        {description && <p className="text-xs text-secondary mt-1">{description}</p>}
+      </div>
       <div className="flex-shrink-0">{children}</div>
     </div>
   );
@@ -68,63 +74,82 @@ function QuestionCard({
   });
 
   return (
-    <div className="rounded-2xl p-5" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-      <div className="flex items-start justify-between gap-3 mb-4">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      className="bg-surface rounded-2xl border border-border/50 shadow-sm p-6 relative overflow-hidden group transition-all hover:bg-surface-2 hover:border-white/10"
+    >
+      <div className="flex items-start justify-between gap-4 mb-6">
         <div className="flex items-start gap-3">
-          <span className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white/50" style={{ background: "rgba(255,255,255,0.06)" }}>
-            {index + 1}
+          <span className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-mono font-bold text-secondary bg-surface-2 border border-border/50 group-hover:text-primary transition-colors">
+            {String(index + 1).padStart(2, '0')}
           </span>
-          <p className="text-sm text-white/85 font-medium leading-relaxed">{question.text}</p>
+          <p className="text-base text-primary font-medium leading-relaxed mt-1">{question.text}</p>
         </div>
         <button
           type="button"
           onClick={() => regenMutation.mutate()}
           disabled={regenMutation.isPending}
           title="Regenerate this question"
-          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-white/40 hover:text-white/70 hover:bg-white/8 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted hover:text-primary hover:bg-surface-2 hover:border-white/20 border border-transparent transition-all disabled:opacity-40 disabled:cursor-not-allowed group/btn"
         >
-          {regenMutation.isPending ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <RefreshCw className="w-3.5 h-3.5" />
-          )}
-          {regenMutation.isPending ? "Regenerating…" : "Regenerate"}
+          <RefreshCw className={cn("w-3.5 h-3.5", regenMutation.isPending && "animate-spin text-white", !regenMutation.isPending && "group-hover/btn:text-white")} />
+          <span className={cn(regenMutation.isPending && "text-white")}>
+             {regenMutation.isPending ? "Generating..." : "Regenerate"}
+          </span>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 ml-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-11">
         {question.choices.map((choice) => (
           <div
             key={choice.id}
-            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm"
-            style={{
-              background: choice.is_correct ? "rgba(22,163,74,0.12)" : "rgba(255,255,255,0.03)",
-              border: choice.is_correct ? "1px solid rgba(22,163,74,0.3)" : "1px solid rgba(255,255,255,0.06)",
-            }}
+            className={cn(
+               "flex items-center gap-3 px-4 py-3 rounded-xl text-sm border transition-colors",
+               choice.is_correct
+                 ? "bg-success/5 border-success/30"
+                 : "bg-surface-2 border-border/50 hover:border-white/10"
+            )}
           >
             {choice.is_correct ? (
-              <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+              <CheckCircle className="w-4 h-4 text-success flex-shrink-0" />
             ) : (
-              <XCircle className="w-4 h-4 text-white/15 flex-shrink-0" />
+              <XCircle className="w-4 h-4 text-muted flex-shrink-0" />
             )}
-            <span className={choice.is_correct ? "text-emerald-300 font-medium" : "text-white/50"}>
+            <span className={cn(
+               "font-medium",
+               choice.is_correct ? "text-success" : "text-secondary"
+            )}>
               {choice.text}
             </span>
           </div>
         ))}
       </div>
 
-      {regenMutation.isError && (
-        <p className="ml-10 mt-2 text-xs text-rose-400">Failed to regenerate. Try again.</p>
-      )}
+      <AnimatePresence>
+        {regenMutation.isError && (
+          <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="pl-11 mt-3 text-xs text-danger">
+            Failed to regenerate. Try again.
+          </motion.p>
+        )}
+      </AnimatePresence>
 
-      {question.topic_tag && (
-        <div className="ml-10 mt-3">
-          <span className="text-xs text-white/25 font-mono">{question.topic_tag}</span>
+      {(question.topic_tag || question.difficulty_score != null) && (
+        <div className="pl-11 mt-5 flex items-center gap-3 flex-wrap">
+          {question.topic_tag && (
+            <span className="text-xs text-muted font-mono bg-background px-2 py-1 rounded border border-border/50">
+              {question.topic_tag}
+            </span>
+          )}
+          {question.difficulty_score != null && (
+            <span className="text-[10px] text-muted uppercase tracking-wider font-bold">
+               Diff: {question.difficulty_score.toFixed(2)}
+            </span>
+          )}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -172,115 +197,199 @@ export default function EditQuizPage({ params }: { params: Promise<{ id: string 
     setQuestions((prev) => prev.map((q) => (q.id === updated.id ? updated : q)));
   };
 
-  const inputClass = "w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/25 outline-none transition-all";
-  const inputStyle = { background: "var(--surface-700)", border: "1px solid rgba(255,255,255,0.08)" };
+  const inputClass = "w-full px-4 py-3 rounded-lg text-sm text-primary placeholder:text-muted bg-surface-2 border border-border/50 outline-none transition-all focus:border-white/20 focus:bg-background";
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--surface-900)" }}><Loader2 className="w-8 h-8 animate-spin text-blue-400" /></div>;
-  if (isError || !quiz) return <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--surface-900)" }}><p className="text-rose-400">Quiz not found. <Link href="/dashboard/instructor" className="underline text-blue-400">Back</Link></p></div>;
+  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  if (isError || !quiz) return <div className="min-h-screen flex items-center justify-center bg-background"><p className="text-danger flex items-center gap-2"><AlertCircle className="w-5 h-5"/> Quiz not found. <Link href="/dashboard/instructor" className="underline text-primary hover:text-white transition-colors">Back to Dashboard</Link></p></div>;
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--surface-900)" }}>
-      <PageWrapper className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <Link href="/dashboard/instructor" className="inline-flex items-center gap-1.5 text-sm text-white/30 hover:text-white/60 transition-colors"><ArrowLeft className="w-4 h-4" /> Dashboard</Link>
-          <Link href={`/quizzes/${id}`} className="inline-flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors"><Eye className="w-4 h-4" /> Preview</Link>
-        </div>
+    <PageWrapper className="max-w-5xl mx-auto pb-40">
+      <div className="flex items-center justify-between mb-8">
+        <Link href="/dashboard/instructor" className="inline-flex items-center gap-2 text-sm text-muted hover:text-primary transition-colors">
+           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+        </Link>
+        <Link href={`/quizzes/${id}`} className="inline-flex items-center gap-2 text-sm text-primary hover:text-white transition-colors bg-surface-2 px-3 py-1.5 rounded-lg border border-border/50 hover:border-white/20 hover:bg-surface">
+           <Eye className="w-4 h-4" /> Preview Student View
+        </Link>
+      </div>
 
-        <div className="mb-6">
-          <h1 className="text-xl font-bold text-white">Edit Quiz</h1>
-          <p className="text-white/30 text-sm mt-0.5 truncate">{quiz.title}</p>
-        </div>
+      <div className="mb-10 text-center">
+        <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="w-16 h-16 rounded-2xl bg-surface-2 border border-border/50 mx-auto flex items-center justify-center mb-6">
+          <Settings2 className="w-8 h-8 text-primary" />
+        </motion.div>
+        <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-3xl md:text-5xl font-semibold tracking-tight text-primary mb-3">
+          Quiz Editor
+        </motion.h1>
+        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-secondary max-w-xl mx-auto truncate font-medium">
+          {quiz.title}
+        </motion.p>
+      </div>
 
-        <div className="space-y-4">
-          {/* Publish */}
-          <div className={`rounded-2xl border p-5 transition-colors ${quiz.is_published ? "bg-emerald-500/10 border-emerald-500/20" : "border-white/8"}`} style={quiz.is_published ? {} : { background: "var(--surface-800)" }}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${quiz.is_published ? "bg-emerald-500/20" : "bg-white/5"}`}>
-                  {quiz.is_published ? <Globe className="w-5 h-5 text-emerald-400" /> : <Lock className="w-5 h-5 text-white/30" />}
-                </div>
-                <div>
-                  <p className="font-semibold text-white text-sm">{quiz.is_published ? "Published" : "Draft"}</p>
-                  <p className="text-xs text-white/35 mt-0.5">{quiz.is_published ? "Visible to all students" : "Hidden — only you can see this"}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+         <div className="lg:col-span-8 space-y-8">
+           {/* Questions Section */}
+           <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-primary flex items-center gap-2">
+                  <HelpCircle className="w-5 h-5 text-secondary" />
+                  Questions
+                  {questions.length > 0 && <span className="text-muted font-normal text-sm bg-surface-2 px-2 py-0.5 rounded border border-border/50">{questions.length}</span>}
+                </h2>
+                <div className="flex items-center gap-2 text-xs text-secondary bg-surface-2 px-3 py-1.5 rounded-lg border border-border/50">
+                   <div className="w-2 h-2 rounded-full bg-success"></div>
+                   Correct answers
                 </div>
               </div>
-              <Toggle checked={quiz.is_published} onChange={(v) => publishMutation.mutate(v)} disabled={publishMutation.isPending} />
-            </div>
-          </div>
+    
+              {questionsLoading ? (
+                <div className="flex items-center justify-center py-20 bg-surface rounded-2xl border border-border/50 shadow-sm">
+                  <div className="flex flex-col items-center gap-3">
+                     <Loader2 className="w-8 h-8 animate-spin text-secondary" />
+                     <p className="text-sm text-muted">Loading questions...</p>
+                  </div>
+                </div>
+              ) : questions.length === 0 ? (
+                <div className="bg-surface rounded-2xl border border-border/50 shadow-sm p-12 text-center">
+                  <HelpCircle className="w-10 h-10 text-muted/30 mx-auto mb-4" />
+                  <p className="text-secondary font-medium">No questions yet</p>
+                  <p className="text-sm text-muted mt-2">Questions will appear here once generated.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {questions.map((q, i) => (
+                    <QuestionCard key={q.id} question={q} index={i} quizId={id} onRegenerated={handleRegenerated} />
+                  ))}
+                </div>
+              )}
+           </div>
+         </div>
 
-          {/* Info */}
-          <div className="rounded-2xl p-5" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <h2 className="text-sm font-semibold text-white/60 mb-4">Quiz Info</h2>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              {[{ icon: BookOpen, value: quiz.question_count ?? "—", label: "Questions" }, { icon: Clock, value: quiz.difficulty, label: "Difficulty", cap: true }, { icon: Users, value: quiz.max_attempts === 0 ? "∞" : quiz.max_attempts, label: "Max Attempts" }].map(({ icon: Icon, value, label, cap }) => (
-                <div key={label}><Icon className="w-4 h-4 text-white/25 mx-auto mb-1" /><p className={`text-xl font-bold text-white ${cap ? "capitalize" : ""}`}>{value}</p><p className="text-xs text-white/30">{label}</p></div>
+         <div className="lg:col-span-4 space-y-6">
+            {/* Info Cards */}
+            <div className="grid grid-cols-2 gap-3">
+              {[{ icon: BookOpen, value: quiz.question_count ?? "--", label: "Questions" }, { icon: Clock, value: quiz.difficulty, label: "Difficulty", cap: true }].map(({ icon: Icon, value, label, cap }, i) => (
+                <div key={label} className="bg-surface rounded-xl border border-border/50 p-4 shrink-0 transition-colors hover:bg-surface-2">
+                   <Icon className="w-5 h-5 text-secondary mb-3" />
+                   <p className={cn("text-xl font-bold text-primary tracking-tight", cap && "capitalize")}>{value}</p>
+                   <p className="text-xs text-muted mt-1">{label}</p>
+                </div>
               ))}
             </div>
-          </div>
-
-          {/* Settings */}
-          <div className="rounded-2xl p-6" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <h2 className="text-sm font-semibold text-white/60 mb-5">Settings</h2>
-            <div className="space-y-4">
-              <div><label className="block text-xs font-medium text-white/40 mb-1.5">Title</label><input type="text" value={form.title} onChange={(e) => set("title")(e.target.value)} className={inputClass} style={inputStyle} placeholder="Quiz title" onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
-              <div><label className="block text-xs font-medium text-white/40 mb-1.5">Description <span className="text-white/20">(optional)</span></label><textarea value={form.description} onChange={(e) => set("description")(e.target.value)} rows={3} className={inputClass + " resize-none"} style={inputStyle} placeholder="What will students learn?" onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-xs font-medium text-white/40 mb-1.5">Time Limit (min)</label><input type="number" min="1" max="180" value={form.timeLimitMinutes} onChange={(e) => set("timeLimitMinutes")(e.target.value)} className={inputClass} style={inputStyle} placeholder="No limit" onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
-                <div><label className="block text-xs font-medium text-white/40 mb-1.5">Max Attempts (0 = ∞)</label><input type="number" min="0" value={form.maxAttempts} onChange={(e) => set("maxAttempts")(e.target.value)} className={inputClass} style={inputStyle} onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-xs font-medium text-white/40 mb-1.5">Available From <span className="text-white/20">(optional)</span></label><input type="datetime-local" value={form.availableFrom} onChange={(e) => set("availableFrom")(e.target.value)} className={inputClass} style={{ ...inputStyle, colorScheme: "dark" }} onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
-                <div><label className="block text-xs font-medium text-white/40 mb-1.5">Available Until <span className="text-white/20">(optional)</span></label><input type="datetime-local" value={form.availableUntil} onChange={(e) => set("availableUntil")(e.target.value)} className={inputClass} style={{ ...inputStyle, colorScheme: "dark" }} onFocus={(e) => { e.target.style.borderColor = "rgba(37,99,235,0.6)"; }} onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }} /></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Options */}
-          <div className="rounded-2xl px-6 pt-2 pb-2" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-            <h2 className="text-sm font-semibold text-white/60 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>Options</h2>
-            <SettingRow label="Shuffle Questions" description="Randomise question order for each attempt"><Toggle checked={form.shuffleQuestions} onChange={set("shuffleQuestions") as (v: boolean) => void} /></SettingRow>
-            <SettingRow label="Shuffle Answer Options" description="Randomise the order of answer choices"><Toggle checked={form.shuffleOptions} onChange={set("shuffleOptions") as (v: boolean) => void} /></SettingRow>
-            <SettingRow label="Per-Question Timer" description="Each question gets its own countdown"><Toggle checked={form.perQuestionTimer} onChange={set("perQuestionTimer") as (v: boolean) => void} /></SettingRow>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button type="button" onClick={handleSave} disabled={settingsMutation.isPending} className="btn-primary disabled:opacity-60">
-              {settingsMutation.isPending ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</> : <><Save className="w-4 h-4" /> Save Settings</>}
-            </button>
-            {saved && <span className="flex items-center gap-1.5 text-sm text-emerald-400 font-medium"><CheckCircle2 className="w-4 h-4" /> Saved!</span>}
-            {settingsMutation.isError && <span className="text-sm text-rose-400">Failed to save.</span>}
-          </div>
-
-          {/* Question Preview */}
-          <div className="pt-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-white/60">
-                Questions
-                {questions.length > 0 && <span className="ml-2 text-white/25 font-normal">({questions.length})</span>}
-              </h2>
-              <p className="text-xs text-white/25">Correct answers highlighted green</p>
+            <div className="bg-surface rounded-xl border border-border/50 p-4 shrink-0 transition-colors hover:bg-surface-2">
+                 <Users className="w-5 h-5 text-secondary mb-3" />
+                 <p className="text-xl font-bold text-primary tracking-tight">{quiz.max_attempts === 0 ? "Unlimited" : quiz.max_attempts}</p>
+                 <p className="text-xs text-muted mt-1">Maximum Attempts</p>
             </div>
 
-            {questionsLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin text-white/30" />
+            {/* Settings Form */}
+            <div className="bg-surface rounded-2xl border border-border/50 shadow-sm overflow-hidden sticky top-6">
+              <div className="p-6 border-b border-border/50 bg-background/50">
+                 <h2 className="text-base font-semibold text-primary flex items-center gap-2">
+                    <Settings2 className="w-4 h-4 text-secondary" />
+                    Quiz Settings
+                 </h2>
               </div>
-            ) : questions.length === 0 ? (
-              <div className="rounded-2xl p-8 text-center" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <p className="text-white/30 text-sm">No questions yet.</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {questions.map((q, i) => (
-                  <QuestionCard key={q.id} question={q} index={i} quizId={id} onRegenerated={handleRegenerated} />
-                ))}
-              </div>
-            )}
-          </div>
+              <div className="p-6 space-y-5">
+                <div>
+                  <label className="block text-xs font-medium text-secondary mb-2 uppercase tracking-wider">Title</label>
+                  <input type="text" value={form.title} onChange={(e) => set("title")(e.target.value)} className={inputClass} placeholder="Quiz title" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-secondary mb-2 uppercase tracking-wider flex justify-between">
+                     Description <span className="text-muted tracking-normal lowercase">(optional)</span>
+                  </label>
+                  <textarea value={form.description} onChange={(e) => set("description")(e.target.value)} rows={3} className={inputClass + " resize-none"} placeholder="What will students learn?" />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-secondary mb-2 uppercase tracking-wider">Time Limit <span className="text-muted tracking-normal lowercase">(min)</span></label>
+                    <input type="number" min="1" max="180" value={form.timeLimitMinutes} onChange={(e) => set("timeLimitMinutes")(e.target.value)} className={inputClass} placeholder="No limit" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-secondary mb-2 uppercase tracking-wider whitespace-nowrap overflow-hidden text-ellipsis">Max Attempts <span className="text-muted tracking-normal lowercase">(0=Unlim)</span></label>
+                    <input type="number" min="0" value={form.maxAttempts} onChange={(e) => set("maxAttempts")(e.target.value)} className={inputClass} />
+                  </div>
+                </div>
 
-          <div className="pb-12" />
+                <div className="space-y-4">
+                   <div>
+                     <label className="block text-xs font-medium text-secondary mb-2 uppercase tracking-wider flex justify-between">Available From <span className="text-muted tracking-normal lowercase">(optional)</span></label>
+                     <input type="datetime-local" value={form.availableFrom} onChange={(e) => set("availableFrom")(e.target.value)} className={cn(inputClass, "[color-scheme:dark]")} />
+                   </div>
+                   <div>
+                     <label className="block text-xs font-medium text-secondary mb-2 uppercase tracking-wider flex justify-between">Available Until <span className="text-muted tracking-normal lowercase">(optional)</span></label>
+                     <input type="datetime-local" value={form.availableUntil} onChange={(e) => set("availableUntil")(e.target.value)} className={cn(inputClass, "[color-scheme:dark]")} />
+                   </div>
+                </div>
+
+                <div className="pt-2 border-y border-border/50">
+                   <SettingRow label="Shuffle Questions"><Toggle checked={form.shuffleQuestions} onChange={set("shuffleQuestions") as (v: boolean) => void} /></SettingRow>
+                   <SettingRow label="Shuffle Options"><Toggle checked={form.shuffleOptions} onChange={set("shuffleOptions") as (v: boolean) => void} /></SettingRow>
+                   <SettingRow label="Per-Question timer"><Toggle checked={form.perQuestionTimer} onChange={set("perQuestionTimer") as (v: boolean) => void} /></SettingRow>
+                </div>
+
+                <div className="pt-2">
+                  <Button type="button" onClick={handleSave} disabled={settingsMutation.isPending} className="w-full" variant="premium">
+                    {settingsMutation.isPending ? "Saving..." : "Save Changes"}
+                  </Button>
+                  
+                  <AnimatePresence>
+                     {saved && (
+                        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-center text-sm text-success font-medium mt-3 flex items-center justify-center gap-1.5">
+                           <CheckCircle2 className="w-4 h-4" /> Changes saved
+                        </motion.p>
+                     )}
+                     {settingsMutation.isError && (
+                        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-center text-sm text-danger mt-3">
+                           Failed to save settings.
+                        </motion.p>
+                     )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+         </div>
+      </div>
+
+      {/* Sticky Publish Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 pointer-events-none">
+        <div className="max-w-4xl mx-auto pointer-events-auto">
+           <motion.div 
+             initial={{ y: 100, opacity: 0 }}
+             animate={{ y: 0, opacity: 1 }}
+             transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.5 }}
+             className={cn(
+                "rounded-2xl border p-4 shadow-2xl backdrop-blur-xl flex items-center justify-between transition-colors duration-500",
+                quiz.is_published 
+                   ? "bg-success/10 border-success/30" 
+                   : "bg-surface-2/90 border-border/50"
+             )}
+           >
+             <div className="flex items-center gap-4">
+                <div className={cn(
+                   "w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-500",
+                   quiz.is_published ? "bg-success/20 text-success" : "bg-background border border-border/50 text-secondary"
+                )}>
+                   {quiz.is_published ? <Globe className="w-6 h-6" /> : <Lock className="w-6 h-6" />}
+                </div>
+                <div>
+                   <h3 className={cn("font-semibold text-base transition-colors duration-500", quiz.is_published ? "text-success" : "text-primary")}>
+                      {quiz.is_published ? "Quiz is Published" : "Draft Mode"}
+                   </h3>
+                   <p className={cn("text-xs transition-colors duration-500", quiz.is_published ? "text-success/70" : "text-muted")}>
+                      {quiz.is_published ? "Visible to students. They can now take this quiz." : "Hidden from students. Publish when ready."}
+                   </p>
+                </div>
+             </div>
+             
+             <div className="flex items-center gap-4">
+                {publishMutation.isPending && <Loader2 className="w-5 h-5 animate-spin text-secondary" />}
+                <Toggle checked={quiz.is_published} onChange={(v) => publishMutation.mutate(v)} disabled={publishMutation.isPending} />
+             </div>
+           </motion.div>
         </div>
-      </PageWrapper>
-    </div>
+      </div>
+    </PageWrapper>
   );
 }

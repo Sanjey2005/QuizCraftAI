@@ -49,20 +49,20 @@ export function TimerBar({ totalSeconds, onExpire }: TimerBarProps) {
 
   const color =
     pct > 50
-      ? "var(--color-accent)"
-      : pct > 10
-        ? "var(--color-warning)"
-        : "var(--color-danger)";
+      ? "#FFFFFF" // primary accent (white in dark theme)
+      : pct > 15
+        ? "#EAB308" // warning
+        : "#EF4444"; // danger
 
   return (
     <div
-      className="w-full bg-slate-100 rounded-full overflow-hidden"
+      className="w-full bg-surface-2 border border-white/5 rounded-full overflow-hidden"
       style={{ height: 6 }}
     >
       <div
         ref={barRef}
-        className="h-full rounded-full"
-        style={{ backgroundColor: color }}
+        className="h-full rounded-full shadow-[0_0_10px_currentColor] transition-colors duration-1000"
+        style={{ backgroundColor: color, color: color }}
       />
     </div>
   );

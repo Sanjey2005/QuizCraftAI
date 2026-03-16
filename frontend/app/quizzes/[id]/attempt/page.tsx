@@ -17,6 +17,8 @@ import { api } from "@/lib/api";
 import { useQuizAttemptStore } from "@/store/quizAttempt";
 import { AnswerChoice } from "@/components/quiz/AnswerChoice";
 import { TimerBar } from "@/components/quiz/TimerBar";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 /* ── Types ── */
 interface Choice {
@@ -86,14 +88,15 @@ function useGlobalTimer(
 function SaveIndicator({ status }: { status: "saved" | "saving" | "offline" }) {
   if (status === "saving") return null;
   return (
-    <div className="fixed bottom-6 right-6 z-30">
-      <div
-        className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium shadow-md border"
-        style={{
-          background: status === "saved" ? "#f0fdf4" : "#fffbeb",
-          borderColor: status === "saved" ? "#bbf7d0" : "#fde68a",
-          color: status === "saved" ? "#166534" : "#92400e",
-        }}
+    <div className="fixed bottom-6 right-6 z-50">
+      <motion.div
+        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+        className={cn(
+           "flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold shadow-2xl border backdrop-blur-md",
+           status === "saved" ? "bg-success/10 border-success/30 text-success" : "bg-warning/10 border-warning/30 text-warning"
+        )}
       >
         {status === "saved" ? (
           <CheckCircle2 className="w-3.5 h-3.5" />
@@ -101,7 +104,7 @@ function SaveIndicator({ status }: { status: "saved" | "saving" | "offline" }) {
           <WifiOff className="w-3.5 h-3.5" />
         )}
         {status === "saved" ? "Saved" : "Offline"}
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -116,20 +119,17 @@ function TabSwitchBanner({
 }) {
   if (count === 0) return null;
   return (
-    <div
-      className="flex items-center gap-3 px-4 py-2.5 text-sm"
-      style={{ background: "#fef9c3", color: "#854d0e" }}
-    >
+    <div className="flex items-center gap-3 px-4 py-3 text-sm bg-warning text-black font-medium">
       <AlertTriangle className="w-4 h-4 flex-shrink-0" />
       <span className="flex-1">
         Tab switch detected ({count} total). Your instructor will be notified.
       </span>
       <button
         onClick={onDismiss}
-        className="p-1 rounded hover:bg-yellow-300/40 transition-colors"
+        className="p-1 rounded hover:bg-black/10 transition-colors"
         aria-label="Dismiss warning"
       >
-        <X className="w-3.5 h-3.5" />
+        <X className="w-4 h-4" />
       </button>
     </div>
   );
@@ -152,6 +152,7 @@ export default function QuizAttemptPage({
   const [tabSwitchCount, setTabSwitchCount] = useState(0);
   const [showTabWarning, setShowTabWarning] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "offline">("saved");
+  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
 
   const {
     currentQuestionIndex,
@@ -220,13 +221,13 @@ export default function QuizAttemptPage({
 
   // Tab-switch detection
   const handleTabSwitch = useCallback(() => {
-    if (!attemptIdRef.current || tabSwitchCooldown.current) return;
+    if (!attemptIdRef.current || tabSwitchCooldown.current || phase !== "active") return;
     tabSwitchCooldown.current = true;
     setTabSwitchCount((c) => c + 1);
     setShowTabWarning(true);
     api.patch(`/api/attempts/${attemptIdRef.current}/tab-switch`).catch(() => {});
     setTimeout(() => { tabSwitchCooldown.current = false; }, 1000);
-  }, []);
+  }, [phase]);
 
   useEffect(() => {
     const onVisibility = () => { if (document.hidden) handleTabSwitch(); };
@@ -243,7 +244,7 @@ export default function QuizAttemptPage({
   const submitAnswerToServer = useCallback(
     (questionId: string, choiceId: string) => {
       if (!attemptIdRef.current) return;
-      const timeSpent = Math.round((Date.now() - questionStartRef.current) / 1000);
+      const timeSpent = Math.max(1, Math.round((Date.now() - questionStartRef.current) / 1000));
       setSaveStatus("saving");
       api
         .post(`/api/attempts/${attemptIdRef.current}/answers`, {
@@ -263,7 +264,8 @@ export default function QuizAttemptPage({
   };
 
   const goToQuestion = (index: number) => {
-    if (index >= 0 && index < questions.length) {
+    if (index >= 0 && index < questions.length && index !== currentQuestionIndex) {
+      setDirection(index > currentQuestionIndex ? 1 : -1);
       setCurrentQuestionIndex(index);
       questionStartRef.current = Date.now();
     }
@@ -290,18 +292,15 @@ export default function QuizAttemptPage({
   /* ── Loading ── */
   if (phase === "creating" || phase === "loading") {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4"
-            style={{ background: "#1E3A5F" }}
-          >
-            <Loader2 className="w-6 h-6 text-white animate-spin" />
+          <div className="w-16 h-16 rounded-2xl bg-surface-2 border border-border/50 flex items-center justify-center mx-auto mb-6 shadow-2xl">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
           </div>
-          <p className="text-slate-600 font-medium text-sm">
-            {phase === "creating" ? "Starting quiz…" : "Loading questions…"}
+          <p className="text-primary font-medium text-lg">
+            {phase === "creating" ? "Initializing environment..." : "Loading questions..."}
           </p>
-          <p className="text-slate-400 text-xs mt-1">This may take a moment</p>
+          <p className="text-muted text-sm mt-2 font-mono">Stand by</p>
         </div>
       </div>
     );
@@ -310,17 +309,16 @@ export default function QuizAttemptPage({
   /* ── Error ── */
   if (phase === "error") {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center max-w-sm mx-4">
-          <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
-            <AlertTriangle className="w-6 h-6 text-red-500" />
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="bg-surface-2 rounded-2xl shadow-2xl border border-danger/20 p-8 text-center max-w-sm w-full mx-auto">
+          <div className="w-16 h-16 rounded-full bg-danger/10 border border-danger/20 flex items-center justify-center mx-auto mb-6">
+            <AlertTriangle className="w-8 h-8 text-danger" />
           </div>
-          <p className="text-slate-800 font-semibold mb-2">Something went wrong</p>
-          <p className="text-slate-500 text-sm mb-6">{errorMsg}</p>
+          <p className="text-primary font-bold text-xl mb-2">Something went wrong</p>
+          <p className="text-secondary text-sm mb-8">{errorMsg}</p>
           <button
             onClick={() => router.push("/quizzes")}
-            className="px-5 py-2.5 rounded-lg text-sm font-semibold text-white transition-all hover:opacity-90"
-            style={{ background: "#1E3A5F" }}
+            className="w-full py-3.5 rounded-xl text-sm font-semibold text-black bg-white transition-all hover:bg-white/90"
           >
             Back to Quizzes
           </button>
@@ -335,65 +333,65 @@ export default function QuizAttemptPage({
   const isFirst = currentQuestionIndex === 0;
   const isLast = currentQuestionIndex === questions.length - 1;
   const selectedChoiceId = answers[question.id];
-  const hasAnswered = !!selectedChoiceId;
   const perQuestion = attemptInfo?.per_question_timer ?? false;
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
   const answeredCount = Object.keys(answers).length;
 
-  return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* ── Tab Switch Warning ── */}
-      <TabSwitchBanner
-        count={showTabWarning ? tabSwitchCount : 0}
-        onDismiss={() => setShowTabWarning(false)}
-      />
+  const animationVariants: import("framer-motion").Variants = {
+    initial: (dir: number) => ({
+      x: dir > 0 ? 50 : -50,
+      opacity: 0,
+    }),
+    animate: {
+      x: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 300, damping: 30, mass: 1 },
+    },
+    exit: (dir: number) => ({
+      x: dir > 0 ? -50 : 50,
+      opacity: 0,
+      transition: { duration: 0.2 },
+    }),
+  };
 
-      {/* ── Top Bar ── */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-14">
+  return (
+    <div className="min-h-screen bg-background flex flex-col font-sans selection:bg-white/20">
+      {/* ── Tab Switch Warning ── */}
+      <AnimatePresence>
+         {showTabWarning && (
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
+               <TabSwitchBanner count={tabSwitchCount} onDismiss={() => setShowTabWarning(false)} />
+            </motion.div>
+         )}
+      </AnimatePresence>
+
+      {/* ── Top Header ── */}
+      <header className="bg-surface border-b border-border/50 sticky top-0 z-20 shadow-sm">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
             {/* Quiz title */}
-            <div className="flex items-center gap-3 min-w-0">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                style={{ background: "#1E3A5F" }}
-              >
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-surface-2 border border-border/50 flex-shrink-0 font-mono font-bold text-white">
                 Q
               </div>
-              <h1
-                className="font-semibold text-sm truncate"
-                style={{ color: "#1E3A5F" }}
-              >
+              <h1 className="font-semibold tracking-tight text-white text-sm md:text-base truncate max-w-[150px] md:max-w-xs">
                 {quizTitle}
               </h1>
             </div>
 
-            {/* Question pill + timer */}
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <span
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
-                style={{ background: "#eff6ff", color: "#2563EB" }}
-              >
-                Question {currentQuestionIndex + 1} of {questions.length}
+            {/* Timers & Counters */}
+            <div className="flex items-center gap-3 md:gap-4 flex-shrink-0">
+              <span className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-2 border border-border/50 text-secondary font-mono tracking-widest uppercase">
+                {String(currentQuestionIndex + 1).padStart(2, '0')} <span className="text-muted/50">/</span> {String(questions.length).padStart(2, '0')}
               </span>
+              <span className="md:hidden text-xs font-mono font-bold text-secondary">{currentQuestionIndex + 1}/{questions.length}</span>
 
               {attemptInfo?.time_limit_seconds != null && (
                 <div
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold tabular-nums"
-                  style={{
-                    background:
-                      timer.pct > 30
-                        ? "#f0fdf4"
-                        : timer.pct > 10
-                          ? "#fffbeb"
-                          : "#fef2f2",
-                    color:
-                      timer.pct > 30
-                        ? "#166534"
-                        : timer.pct > 10
-                          ? "#92400e"
-                          : "#991b1b",
-                  }}
+                  className={cn(
+                     "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-bold tracking-widest tabular-nums border",
+                     timer.pct > 30 ? "bg-surface-2 border-border/50 text-white" : timer.pct > 10 ? "bg-warning/10 border-warning/30 text-warning" : "bg-danger/10 border-danger/30 text-danger animate-pulse"
+                  )}
                 >
                   <Clock className="w-3.5 h-3.5" />
                   {timer.formatted}
@@ -403,152 +401,150 @@ export default function QuizAttemptPage({
           </div>
         </div>
 
-        {/* Overall progress bar */}
-        <div className="w-full bg-slate-100" style={{ height: 3 }}>
+        {/* Global Progress Line */}
+        <div className="w-full bg-surface-2 h-0.5">
           <div
-            className="h-full transition-all duration-500 ease-out"
-            style={{ width: `${progress}%`, background: "#2563EB" }}
+            className="h-full transition-all duration-500 ease-out bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+            style={{ width: `${progress}%` }}
           />
         </div>
       </header>
 
-      {/* ── Main Content ── */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-8">
-        {/* Question Card */}
-        <div
-          className="bg-white border border-slate-200 p-6 sm:p-8"
-          style={{ borderRadius: 8, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
-        >
-          {/* Per-question timer */}
-          {perQuestion && (
-            <div className="mb-6">
-              <TimerBar
-                key={`timer-${currentQuestionIndex}`}
-                totalSeconds={question.time_limit_seconds ?? DEFAULT_QUESTION_SECONDS}
-                onExpire={() => {
-                  if (currentQuestionIndex < questions.length - 1) {
-                    goToQuestion(currentQuestionIndex + 1);
-                  } else {
-                    handleFinish();
-                  }
-                }}
-              />
-            </div>
-          )}
+      {/* ── Main Canvas ── */}
+      <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-8 md:py-12 flex flex-col justify-center">
+         <div className="relative">
+            <AnimatePresence mode="wait" custom={direction}>
+               <motion.div
+                  key={currentQuestionIndex}
+                  custom={direction}
+                  variants={animationVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="w-full"
+               >
+                 <div className="bg-surface-2 border border-border/50 rounded-2xl shadow-2xl p-6 md:p-10 lg:p-12 relative overflow-hidden">
+                   {/* Background Gradient Glow */}
+                   <div className="absolute -top-[100px] -right-[100px] w-64 h-64 bg-white/5 blur-3xl rounded-full pointer-events-none" />
 
-          {/* Topic tag + difficulty */}
-          <div className="flex items-center gap-2 mb-4">
-            {question.topic_tag && (
-              <span
-                className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium"
-                style={{ background: "#f1f5f9", color: "#64748b" }}
-              >
-                {question.topic_tag}
-              </span>
-            )}
-          </div>
+                   {/* Per-question timer line */}
+                   {perQuestion && (
+                     <div className="mb-8">
+                       <TimerBar
+                         key={`timer-${currentQuestionIndex}`}
+                         totalSeconds={question.time_limit_seconds ?? DEFAULT_QUESTION_SECONDS}
+                         onExpire={() => {
+                           if (currentQuestionIndex < questions.length - 1) {
+                             goToQuestion(currentQuestionIndex + 1);
+                           } else {
+                             handleFinish();
+                           }
+                         }}
+                       />
+                     </div>
+                   )}
 
-          {/* Question text */}
-          <p
-            className="text-slate-900 leading-relaxed mb-6"
-            style={{ fontSize: 18, fontWeight: 600 }}
-          >
-            {question.text}
-          </p>
+                   {/* Metadata */}
+                   <div className="flex items-center gap-3 mb-6">
+                     {question.topic_tag && (
+                       <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] uppercase tracking-widest font-bold bg-background text-muted border border-border/50">
+                         {question.topic_tag}
+                       </span>
+                     )}
+                   </div>
 
-          {/* Answer choices */}
-          <div className="space-y-3">
-            {question.choices.map((choice, i) => (
-              <AnswerChoice
-                key={choice.id}
-                label={CHOICE_LABELS[i] ?? String(i + 1)}
-                text={choice.text}
-                selected={selectedChoiceId === choice.id}
-                disabled={phase === "finishing"}
-                onClick={() => handleChoiceSelect(question.id, choice.id)}
-              />
-            ))}
-          </div>
-        </div>
+                   {/* Question Text */}
+                   <h2 className="text-xl md:text-2xl font-medium text-white leading-snug tracking-tight mb-8">
+                     {question.text}
+                   </h2>
 
-        {/* Question dots — quick navigation */}
-        <div className="flex items-center justify-center gap-1.5 mt-6 flex-wrap">
-          {questions.map((q, i) => (
-            <button
-              key={q.id}
-              onClick={() => goToQuestion(i)}
-              className="w-2.5 h-2.5 rounded-full transition-all"
-              style={{
-                background:
-                  i === currentQuestionIndex
-                    ? "#2563EB"
-                    : answers[q.id]
-                      ? "#1E3A5F"
-                      : "#cbd5e1",
-                transform: i === currentQuestionIndex ? "scale(1.4)" : "scale(1)",
-              }}
-              aria-label={`Go to question ${i + 1}`}
-            />
-          ))}
-        </div>
+                   {/* Answers */}
+                   <div className="space-y-4">
+                     {question.choices.map((choice, i) => (
+                       <AnswerChoice
+                         key={choice.id}
+                         label={CHOICE_LABELS[i] ?? String(i + 1)}
+                         text={choice.text}
+                         selected={selectedChoiceId === choice.id}
+                         disabled={phase === "finishing"}
+                         onClick={() => handleChoiceSelect(question.id, choice.id)}
+                       />
+                     ))}
+                   </div>
+                 </div>
+               </motion.div>
+            </AnimatePresence>
+         </div>
 
-        {/* Answered count */}
-        <p className="text-center text-xs text-slate-400 mt-3">
-          {answeredCount} of {questions.length} answered
-        </p>
+         {/* Navigation Dots */}
+         <div className="flex items-center justify-center gap-2 mt-8 flex-wrap max-w-xl mx-auto">
+           {questions.map((q, i) => (
+             <button
+               key={q.id}
+               onClick={() => goToQuestion(i)}
+               className="w-2.5 h-2.5 rounded-full transition-all outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+               style={{
+                 background:
+                   i === currentQuestionIndex
+                     ? "#FFFFFF"
+                     : answers[q.id]
+                       ? "rgba(255, 255, 255, 0.3)"
+                       : "rgba(255, 255, 255, 0.1)",
+                 transform: i === currentQuestionIndex ? "scale(1.5)" : "scale(1)",
+               }}
+               aria-label={`Go to question ${i + 1}`}
+             />
+           ))}
+         </div>
+         <p className="text-center text-xs text-muted/50 font-mono tracking-widest mt-4 uppercase">
+           {answeredCount} / {questions.length} Answered
+         </p>
       </main>
 
-      {/* ── Bottom Bar ── */}
-      <div className="bg-white border-t border-slate-200 sticky bottom-0 z-20">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          {/* Previous (ghost) */}
+      {/* ── Bottom Navigation Bar ── */}
+      <div className="bg-surface border-t border-border/50 sticky bottom-0 z-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <button
             onClick={() => goToQuestion(currentQuestionIndex - 1)}
             disabled={isFirst || phase === "finishing"}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-            style={{ color: "#64748b" }}
-            onMouseEnter={(e) => {
-              if (!isFirst) (e.currentTarget.style.background = "#f1f5f9");
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
-            }}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-secondary transition-colors disabled:opacity-20 disabled:cursor-not-allowed hover:bg-surface-2 hover:text-white"
           >
-            <ChevronLeft className="w-4 h-4" />
-            Previous
+            <ChevronLeft className="w-5 h-5" />
+            <span className="hidden sm:inline">Previous</span>
           </button>
 
-          {/* Next / Finish (filled) */}
           {isLast ? (
-            <button
-              onClick={handleFinish}
-              disabled={phase === "finishing"}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-60"
-              style={{ background: "#2563EB" }}
-            >
-              {phase === "finishing" ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Send className="w-4 h-4" />
-              )}
-              Finish Quiz
-            </button>
+             <motion.button
+               whileHover={{ scale: phase === "finishing" ? 1 : 1.02 }}
+               whileTap={{ scale: phase === "finishing" ? 1 : 0.98 }}
+               onClick={handleFinish}
+               disabled={phase === "finishing"}
+               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-bold text-black bg-white transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] disabled:opacity-50 disabled:cursor-wait hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]"
+             >
+               {phase === "finishing" ? (
+                 <Loader2 className="w-4 h-4 animate-spin text-black" />
+               ) : (
+                 <Send className="w-4 h-4 ml-1" />
+               )}
+               {phase === "finishing" ? "Submitting..." : "Submit Quiz"}
+             </motion.button>
           ) : (
             <button
-              onClick={() => goToQuestion(currentQuestionIndex + 1)}
-              disabled={phase === "finishing"}
-              className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-lg text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-40"
-              style={{ background: "#2563EB" }}
-            >
-              Next
-              <ChevronRight className="w-4 h-4" />
+               onClick={() => goToQuestion(currentQuestionIndex + 1)}
+               disabled={phase === "finishing"}
+               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-surface-2 hover:text-white border border-border/50 hover:border-white/10"
+             >
+               <span className="hidden sm:inline">Next</span>
+               <span className="sm:hidden">Next</span>
+               <ChevronRight className="w-5 h-5" />
             </button>
           )}
         </div>
       </div>
 
-      {/* ── Save Indicator ── */}
-      <SaveIndicator status={saveStatus} />
+      <AnimatePresence>
+         {saveStatus !== "saving" && <SaveIndicator status={saveStatus} />}
+      </AnimatePresence>
     </div>
   );
 }

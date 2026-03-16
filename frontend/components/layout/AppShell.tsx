@@ -1,22 +1,28 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Navbar } from "./Navbar";
-import { CustomCursor } from "@/components/ui/custom-cursor";
+import { Sidebar } from "./Sidebar";
 
-const HIDE_NAVBAR_ROUTES = ["/", "/login", "/register"];
+const NO_SIDEBAR_ROUTES = ["/", "/login", "/register"];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const hideNavbar = HIDE_NAVBAR_ROUTES.includes(pathname) ||
-    pathname.endsWith("/attempt");
+  const hideSidebar =
+    NO_SIDEBAR_ROUTES.includes(pathname) || pathname.endsWith("/attempt");
+
+  if (hideSidebar) {
+    return <>{children}</>;
+  }
 
   return (
-    <>
-      <CustomCursor />
-      {!hideNavbar && <Navbar />}
-      {children}
-    </>
+    <div className="flex min-h-screen">
+      <Sidebar />
+      <main
+        className="flex-1 min-h-screen overflow-y-auto bg-background"
+      >
+        {children}
+      </main>
+    </div>
   );
 }

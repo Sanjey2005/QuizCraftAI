@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { TopicBreakdownChart } from "@/components/analytics/TopicBreakdownChart";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface QuizAnalytics {
   quiz_id: string; quiz_title: string; total_attempts: number;
@@ -19,7 +20,22 @@ interface QuizAnalytics {
 interface LeaderboardEntry { rank: number; username: string; display_name: string; score: number; time_spent_seconds: number; completed_at: string; }
 interface LeaderboardData { quiz_id: string; quiz_title: string; leaderboard: LeaderboardEntry[]; }
 
-const fmt = (s: number | null) => { if (!s) return "—"; return `${Math.floor(s/60)}m ${Math.round(s%60)}s`; };
+const fmt = (s: number | null) => { if (!s) return "--"; return `${Math.floor(s/60)}m ${Math.round(s%60)}s`; };
+
+const STAT_STYLES: { borderColor: string; iconBg: string; iconColor: string }[] = [
+  { borderColor: "#2563EB", iconBg: "rgba(37,99,235,0.1)", iconColor: "#60A5FA" }, // Apps
+  { borderColor: "#D97706", iconBg: "rgba(217,119,6,0.1)", iconColor: "#FBBF24" }, // Avg Score
+  { borderColor: "#16A34A", iconBg: "rgba(22,163,74,0.1)", iconColor: "#4ADE80" }, // Top Score
+  { borderColor: "#64748B", iconBg: "rgba(100,116,139,0.1)", iconColor: "#94A3B8" }, // Time
+];
+
+function shimmerVariant() {
+   return {
+      initial: { opacity: 0, y: 10 },
+      animate: { opacity: 1, y: 0 },
+      exit: { opacity: 0, scale: 0.95 }
+   };
+}
 
 export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -39,113 +55,196 @@ export default function QuizAnalyticsPage({ params }: { params: Promise<{ id: st
   });
 
   const PODIUM = [
-    { bg: "bg-amber-500/10", border: "border-amber-500/20", text: "text-amber-400" },
-    { bg: "bg-white/5", border: "border-white/10", text: "text-white/60" },
-    { bg: "bg-orange-500/10", border: "border-orange-500/20", text: "text-orange-400" },
+    { bg: "bg-[#332A15]/80", border: "border-[#D4AF37]/30", text: "text-[#D4AF37]", shadow: "shadow-[0_0_20px_rgba(212,175,55,0.2)]" }, // Gold
+    { bg: "bg-[#1E252E]/80", border: "border-[#C0C0C0]/30", text: "text-[#C0C0C0]", shadow: "shadow-[0_0_20px_rgba(192,192,192,0.1)]" }, // Silver
+    { bg: "bg-[#2E1E16]/80", border: "border-[#CD7F32]/30", text: "text-[#CD7F32]", shadow: "shadow-[0_0_20px_rgba(205,127,50,0.15)]" }, // Bronze
   ];
 
+  if (isLoading) return (
+   <div className="min-h-screen bg-background flex items-center justify-center">
+     <div className="text-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
+        <p className="text-secondary font-mono text-xs uppercase tracking-widest">Loading Analytics</p>
+     </div>
+   </div>
+  );
+
+  if (isError || !data) return (
+   <div className="min-h-screen bg-background flex items-center justify-center p-4">
+     <div className="bg-surface-2 rounded-2xl shadow-2xl border border-danger/20 p-8 text-center max-w-sm w-full mx-auto">
+       <p className="text-primary font-bold text-xl mb-2">Could not load analytics</p>
+       <p className="text-secondary text-sm mb-8">Data unavailable or quiz deleted.</p>
+       <Link href="/dashboard/instructor" className="text-sm border-b border-primary/30 pb-0.5 text-primary hover:text-white transition-colors">
+          Back to Dashboard
+       </Link>
+     </div>
+   </div>
+  );
+
   return (
-    <div className="min-h-screen" style={{ background: "var(--surface-900)" }}>
-      <PageWrapper>
-        <Link href="/dashboard/instructor" className="inline-flex items-center gap-1.5 text-sm text-white/30 hover:text-white/60 transition-colors mb-6">
+    <div className="min-h-screen bg-background">
+      <PageWrapper className="max-w-5xl mx-auto py-10 md:py-16">
+        <Link href="/dashboard/instructor" className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-muted hover:text-primary transition-colors mb-8">
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </Link>
 
-        {isLoading && <div className="flex items-center justify-center py-24"><Loader2 className="w-8 h-8 animate-spin text-blue-400" /></div>}
-        {isError && <div className="text-center py-24"><p className="text-rose-400 mb-4">Could not load analytics.</p><Link href="/dashboard/instructor" className="text-sm text-blue-400 underline">Back</Link></div>}
+        {/* Header */}
+        <div className="mb-10">
+          <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-2 flex items-center gap-2">
+             <TrendingUp className="w-3.5 h-3.5" /> Analytics Overview
+          </p>
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-white">{data.quiz_title}</h1>
+        </div>
 
-        {data && (
-          <>
-            <div className="mb-6">
-              <p className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-1">Quiz Analytics</p>
-              <h1 className="text-2xl font-bold text-white">{data.quiz_title}</h1>
-            </div>
+        {/* Tabs */}
+        <div className="flex gap-2 p-1.5 rounded-xl mb-10 w-fit bg-surface-2 border border-border/50 shadow-inner overflow-x-auto max-w-full">
+          {[{ id: "overview", label: "Overview" }, { id: "leaderboard", label: "Leaderboard" }].map(({ id: tid, label }) => (
+            <button key={tid} onClick={() => setTab(tid as "overview" | "leaderboard")}
+              className={cn(
+                "px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 relative",
+                tab === tid
+                  ? "text-white bg-white/10 shadow-sm border border-white/5"
+                  : "text-muted hover:text-primary hover:bg-white/5"
+              )}>
+              {tab === tid && <motion.div layoutId="analyticstab" className="absolute inset-0 bg-white/5 rounded-lg border border-white/10" />}
+              <span className="relative z-10">{label}</span>
+            </button>
+          ))}
+        </div>
 
-            <div className="flex gap-1 p-1 rounded-xl mb-6 w-fit" style={{ background: "var(--surface-700)" }}>
-              {[{ id: "overview", label: "Overview" }, { id: "leaderboard", label: "Leaderboard" }].map(({ id: tid, label }) => (
-                <button key={tid} onClick={() => setTab(tid as "overview" | "leaderboard")}
-                  className={cn("px-4 py-2 rounded-lg text-sm font-medium transition-all", tab === tid ? "bg-white/10 text-white shadow-sm" : "text-white/40 hover:text-white/60")}>
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            {tab === "overview" && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  {[
-                    { label: "Total Attempts", value: String(data.total_attempts), icon: Users },
-                    { label: "Average Score", value: data.avg_score != null ? `${Math.round(data.avg_score)}%` : "—", icon: TrendingUp },
-                    { label: "Top Score", value: data.best_score != null ? `${Math.round(data.best_score)}%` : "—", icon: Trophy },
-                    { label: "Avg Time", value: fmt(data.avg_time_seconds), icon: Clock },
-                  ].map(({ label, value, icon: Icon }) => (
-                    <div key={label} className="rounded-2xl p-5 gradient-border" style={{ background: "var(--surface-800)" }}>
-                      <Icon className="w-4 h-4 text-white/30 mb-3" />
-                      <p className="text-2xl font-black text-white tracking-tight">{value}</p>
-                      <p className="text-xs text-white/35 mt-0.5">{label}</p>
+        <AnimatePresence mode="wait">
+        {tab === "overview" && (
+          <motion.div key="overview" variants={shimmerVariant()} initial="initial" animate="animate" exit="exit" className="space-y-6">
+            {/* Stat Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { label: "Total Attempts", value: String(data.total_attempts), icon: Users },
+                { label: "Average Score", value: data.avg_score != null ? `${Math.round(data.avg_score)}%` : "--", icon: TrendingUp },
+                { label: "Top Score", value: data.best_score != null ? `${Math.round(data.best_score)}%` : "--", icon: Trophy },
+                { label: "Avg Time", value: fmt(data.avg_time_seconds), icon: Clock },
+              ].map(({ label, value, icon: Icon }, idx) => {
+                const s = STAT_STYLES[idx];
+                return (
+                  <div
+                    key={label}
+                    className="rounded-2xl p-6 bg-surface-2 border border-border/50 shadow-md relative overflow-hidden group hover:bg-surface transition-colors"
+                  >
+                     <div className="absolute top-0 right-0 w-24 h-24 blur-3xl rounded-full opacity-20 pointer-events-none transition-opacity group-hover:opacity-40" style={{ backgroundColor: s.iconColor }} />
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 border border-white/5 shadow-inner"
+                      style={{ background: s.iconBg }}
+                    >
+                      <Icon className="w-5 h-5" style={{ color: s.iconColor }} />
                     </div>
-                  ))}
+                    <p className="text-3xl font-black tracking-tight text-white mb-1 font-mono">{value}</p>
+                    <p className="text-xs uppercase tracking-widest text-muted font-semibold">{label}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Topic Breakdown */}
+            {data.topic_breakdown && Object.keys(data.topic_breakdown).length > 0 && (
+              <div className="rounded-2xl p-6 md:p-8 bg-surface-2 border border-border/50 shadow-md">
+                <h2 className="text-base font-semibold text-white mb-6">Topic Breakdown</h2>
+                <div className="overflow-x-auto pb-4">
+                  <TopicBreakdownChart topicBreakdown={data.topic_breakdown} />
                 </div>
-                {data.topic_breakdown && Object.keys(data.topic_breakdown).length > 0 && (
-                  <div className="rounded-2xl p-6" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <h2 className="font-bold text-white mb-4">Topic Breakdown</h2>
-                    <TopicBreakdownChart topicBreakdown={data.topic_breakdown} />
-                  </div>
-                )}
-                {data.total_attempts === 0 && (
-                  <div className="rounded-2xl p-12 text-center" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <p className="text-white/30 text-sm">No attempts yet — share the quiz to see analytics.</p>
-                  </div>
-                )}
               </div>
             )}
 
-            {tab === "leaderboard" && (
-              lbLoading ? <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-blue-400" /></div> :
-              !lbData?.leaderboard?.length ? (
-                <div className="rounded-2xl p-16 text-center" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <Medal className="w-12 h-12 text-white/10 mx-auto mb-4" />
-                  <p className="text-white/40 font-medium">No attempts yet</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className={cn("grid gap-4", lbData.leaderboard.length === 1 ? "grid-cols-1 max-w-xs" : lbData.leaderboard.length === 2 ? "grid-cols-2 max-w-lg" : "grid-cols-3 max-w-2xl")}>
-                    {lbData.leaderboard.slice(0, 3).map((e) => {
-                      const s = PODIUM[e.rank - 1];
-                      return (
-                        <div key={e.rank} className={cn("flex flex-col items-center p-5 rounded-2xl border", s?.bg, s?.border)}>
-                          <Medal className={cn("w-7 h-7 mb-2", s?.text)} />
-                          <p className="font-bold text-white text-sm text-center">{e.display_name}</p>
-                          <p className="text-xs text-white/30 mb-2">@{e.username}</p>
-                          <p className={cn("text-2xl font-black font-mono", s?.text)}>{Math.round(e.score)}%</p>
-                          <p className="text-xs text-white/25 mt-1 flex items-center gap-1"><Clock className="w-3 h-3" />{fmt(e.time_spent_seconds)}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {lbData.leaderboard.length > 3 && (
-                    <div className="rounded-2xl overflow-hidden" style={{ background: "var(--surface-800)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                      <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                        <span className="text-sm font-semibold text-white/60">Other Rankings</span>
-                      </div>
-                      {lbData.leaderboard.slice(3).map((e) => (
-                        <div key={e.rank} className="flex items-center gap-4 px-5 py-3.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                          <span className="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-full bg-white/5 text-white/40 text-sm font-bold">{e.rank}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-white text-sm truncate">{e.display_name}</p>
-                            <p className="text-xs text-white/30">@{e.username}</p>
-                          </div>
-                          <p className="text-xs text-white/25 flex items-center gap-1"><Clock className="w-3 h-3" />{fmt(e.time_spent_seconds)}</p>
-                          <p className="w-14 text-right font-mono font-bold text-sm text-blue-400">{Math.round(e.score)}%</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )
+            {/* Empty State */}
+            {data.total_attempts === 0 && (
+              <div className="rounded-2xl p-16 text-center bg-surface-2 border border-border/50 shadow-md flex flex-col items-center">
+                 <Users className="w-10 h-10 text-muted/30 mb-4" />
+                <p className="text-sm font-medium text-secondary">No attempts yet</p>
+                <p className="text-xs text-muted mt-2 max-w-xs mx-auto">Share the quiz with students to start gathering analytics data.</p>
+              </div>
             )}
-          </>
+          </motion.div>
         )}
+
+        {tab === "leaderboard" && (
+          <motion.div key="leaderboard" variants={shimmerVariant()} initial="initial" animate="animate" exit="exit">
+          {lbLoading ? (
+            <div className="flex justify-center py-24">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : !lbData?.leaderboard?.length ? (
+            <div className="rounded-2xl p-16 text-center bg-surface-2 border border-border/50 shadow-md flex flex-col items-center">
+              <Medal className="w-12 h-12 mb-4 text-muted/30" />
+              <p className="font-medium text-secondary">No recorded scores yet</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Podium */}
+              <div className={cn(
+                "grid gap-4",
+                lbData.leaderboard.length === 1 ? "grid-cols-1 max-w-sm mx-auto" :
+                lbData.leaderboard.length === 2 ? "grid-cols-2 max-w-2xl mx-auto" : "grid-cols-1 md:grid-cols-3"
+              )}>
+                {lbData.leaderboard.slice(0, 3).map((e) => {
+                  const s = PODIUM[e.rank - 1];
+                  return (
+                     <motion.div 
+                        key={e.rank} 
+                        initial={{ opacity: 0, scale: 0.9 }} 
+                        animate={{ opacity: 1, scale: 1 }} 
+                        transition={{ delay: e.rank * 0.1 }}
+                        className={cn("flex flex-col items-center p-6 md:p-8 rounded-2xl border relative overflow-hidden", s?.bg, s?.border, s?.shadow)}
+                     >
+                      <div className="absolute top-0 right-0 w-32 h-32 blur-3xl bg-white/5 pointer-events-none" />
+                      
+                      <div className="relative z-10 text-center">
+                         <div className={cn("inline-flex items-center justify-center w-12 h-12 rounded-full border border-white/10 bg-black/20 shadow-inner mb-4", s?.text)}>
+                            <Medal className="w-6 h-6" />
+                         </div>
+                         <p className="font-bold text-base text-white truncate max-w-[150px]">{e.display_name}</p>
+                         <p className="text-xs mb-3 text-muted">@{e.username}</p>
+                         <p className={cn("text-4xl font-black font-mono tracking-tighter", s?.text)}>{Math.round(e.score)}%</p>
+                         <p className="text-xs mt-3 flex items-center justify-center gap-1.5 text-secondary uppercase tracking-widest font-mono">
+                            <Clock className="w-3.5 h-3.5" /> {fmt(e.time_spent_seconds)}
+                         </p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Other Rankings */}
+              {lbData.leaderboard.length > 3 && (
+                <div className="rounded-2xl overflow-hidden bg-surface-2 border border-border/50 shadow-md">
+                  <div className="px-6 py-4 border-b border-border/50 bg-background/50">
+                    <span className="text-xs font-semibold uppercase tracking-widest text-secondary">Other Placements</span>
+                  </div>
+                  <div className="divide-y divide-border/50">
+                     {lbData.leaderboard.slice(3).map((e) => (
+                     <div key={e.rank} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 px-6 py-4 hover:bg-surface transition-colors group">
+                        <div className="flex items-center gap-4 flex-1 min-w-0">
+                           <span className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-background border border-border/50 text-xs font-mono font-bold text-secondary group-hover:text-primary transition-colors">
+                              {e.rank}
+                           </span>
+                           <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-sm text-primary truncate leading-tight">{e.display_name}</p>
+                              <p className="text-xs text-muted">@{e.username}</p>
+                           </div>
+                        </div>
+                        <div className="flex items-center justify-between sm:justify-end gap-6 sm:w-auto mt-2 sm:mt-0 ml-12 sm:ml-0">
+                           <p className="text-xs flex items-center gap-1.5 text-secondary font-mono tracking-wide">
+                              <Clock className="w-3.5 h-3.5" />{fmt(e.time_spent_seconds)}
+                           </p>
+                           <p className="w-16 text-right font-mono font-bold text-base text-white">{Math.round(e.score)}%</p>
+                        </div>
+                     </div>
+                     ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          </motion.div>
+        )}
+        </AnimatePresence>
       </PageWrapper>
     </div>
   );
