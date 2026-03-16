@@ -31,17 +31,17 @@ interface NavLink {
 }
 
 const INSTRUCTOR_LINKS: NavLink[] = [
-  { href: "/dashboard/instructor", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5 shrink-0 text-[#555555]" /> },
-  { href: "/classrooms", label: "Classrooms", icon: <School className="w-5 h-5 shrink-0 text-[#555555]" /> },
-  { href: "/quizzes/generate", label: "Generate Quiz", icon: <Sparkles className="w-5 h-5 shrink-0 text-[#555555]" /> },
-  { href: "/quizzes", label: "Discover", icon: <Compass className="w-5 h-5 shrink-0 text-[#555555]" /> },
+  { href: "/dashboard/instructor", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5 shrink-0" /> },
+  { href: "/classrooms", label: "Classrooms", icon: <School className="w-5 h-5 shrink-0" /> },
+  { href: "/quizzes/generate", label: "Generate Quiz", icon: <Sparkles className="w-5 h-5 shrink-0" /> },
+  { href: "/quizzes", label: "Discover", icon: <Compass className="w-5 h-5 shrink-0" /> },
 ];
 
 const STUDENT_LINKS: NavLink[] = [
-  { href: "/dashboard/student", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5 shrink-0 text-[#555555]" /> },
-  { href: "/classrooms", label: "My Classrooms", icon: <School className="w-5 h-5 shrink-0 text-[#555555]" /> },
-  { href: "/quizzes", label: "Discover", icon: <Compass className="w-5 h-5 shrink-0 text-[#555555]" /> },
-  { href: "/analytics/me", label: "My Analytics", icon: <BarChart2 className="w-5 h-5 shrink-0 text-[#555555]" /> },
+  { href: "/dashboard/student", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5 shrink-0" /> },
+  { href: "/classrooms", label: "My Classrooms", icon: <School className="w-5 h-5 shrink-0" /> },
+  { href: "/quizzes", label: "Discover", icon: <Compass className="w-5 h-5 shrink-0" /> },
+  { href: "/analytics/me", label: "My Analytics", icon: <BarChart2 className="w-5 h-5 shrink-0" /> },
 ];
 
 function SidebarContent() {
@@ -104,8 +104,8 @@ function SidebarContent() {
               className={cn(
                 "transition-all duration-150",
                 active
-                  ? "text-white bg-[#1A1A1A] border-l-[3px] border-white rounded-l-none"
-                  : "hover:bg-[#1A1A1A]"
+                  ? "text-white bg-[#1A1A1A] font-medium"
+                  : "text-[#707070] hover:text-white hover:bg-[#1A1A1A]"
               )}
             />
           );

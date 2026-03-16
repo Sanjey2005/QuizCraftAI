@@ -10,14 +10,14 @@ type Logo = {
 };
 
 const LOGOS: Logo[] = [
-  { src: "https://svgl.app/library/nvidia_wordmark.svg",  alt: "NVIDIA" },
-  { src: "https://svgl.app/library/nextjs_icon_dark.svg", alt: "Next.js" },
-  { src: "https://svgl.app/library/django.svg",           alt: "Django" },
-  { src: "https://svgl.app/library/postgresql.svg",       alt: "PostgreSQL" },
-  { src: "https://svgl.app/library/redis.svg",            alt: "Redis" },
-  { src: "https://svgl.app/library/tailwindcss.svg",      alt: "Tailwind CSS" },
-  { src: "https://svgl.app/library/vercel_wordmark.svg",  alt: "Vercel" },
-  { src: "https://svgl.app/library/railway-light.svg",    alt: "Railway" },
+  { src: "https://cdn.simpleicons.org/nvidia/white",  alt: "NVIDIA" },
+  { src: "https://cdn.simpleicons.org/nextdotjs/white", alt: "Next.js" },
+  { src: "https://cdn.simpleicons.org/django/white",           alt: "Django" },
+  { src: "https://cdn.simpleicons.org/postgresql/white",       alt: "PostgreSQL" },
+  { src: "https://cdn.simpleicons.org/redis/white",            alt: "Redis" },
+  { src: "https://cdn.simpleicons.org/tailwindcss/white",      alt: "Tailwind CSS" },
+  { src: "https://cdn.simpleicons.org/vercel/white",  alt: "Vercel" },
+  { src: "https://cdn.simpleicons.org/railway/white",    alt: "Railway" },
 ];
 
 function LogoCard({
@@ -39,7 +39,7 @@ function LogoCard({
       <img
         src={logo.src}
         alt={logo.alt}
-        className="pointer-events-none h-5 select-none brightness-0 invert"
+        className="pointer-events-none h-8 md:h-10 select-none opacity-80 mix-blend-plus-lighter"
         height="auto"
         width="auto"
       />
