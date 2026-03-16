@@ -11,206 +11,326 @@ Determine the default path for components and styles.
 If default path for components is not /components/ui, provide instructions on why it's important to create this folder
 Copy-paste this component to /components/ui folder:
 ```tsx
-faqs-1.tsx
-import React from 'react';
-import {
-	Accordion,
-	AccordionContent,
-	AccordionItem,
-	AccordionTrigger,
-} from '@/components/ui/accordion';
+creative-pricing.tsx
+import { Button } from "@/components/ui/button";
+import { Check, Pencil, Star, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export function FaqsSection() {
-	return (
-		<div className="mx-auto w-full max-w-3xl space-y-7 px-4 pt-16">
-			<div className="space-y-2">
-				<h2 className="text-3xl font-bold md:text-4xl">Frequently Asked Questions</h2>
-				<p className="text-muted-foreground max-w-2xl">
-					Here are some common questions and answers that you might encounter when using Efferd. If
-					you don't find the answer you're looking for, feel free to reach out.
-				</p>
-			</div>
-			<Accordion
-				type="single"
-				collapsible
-				className="bg-card dark:bg-card/50 w-full -space-y-px rounded-lg "
-				defaultValue="item-1"
-			>
-				{questions.map((item) => (
-					<AccordionItem
-						value={item.id}
-						key={item.id}
-						className="relative border-x first:rounded-t-lg first:border-t last:rounded-b-lg last:border-b"
-					>
-						<AccordionTrigger className="px-4 py-4 text-[15px] leading-6 hover:no-underline">
-							{item.title}
-						</AccordionTrigger>
-						<AccordionContent className="text-muted-foreground pb-4 px-4">
-							{item.content}
-						</AccordionContent>
-					</AccordionItem>
-				))}
-			</Accordion>
-			<p className="text-muted-foreground">
-				Can't find what you're looking for? Contact our{' '}
-				<a href="#" className="text-primary hover:underline">
-					customer support team
-				</a>
-			</p>
-		</div>
-	);
+interface PricingTier {
+    name: string;
+    icon: React.ReactNode;
+    price: number;
+    description: string;
+    features: string[];
+    popular?: boolean;
+    color: string;
 }
 
-const questions = [
-	{
-		id: 'item-1',
-		title: 'What is Efferd?',
-		content:
-			'Efferd is a collection of beautifully crafted Shadcn UI blocks and components, designed to help developers build modern websites with ease.',
-	},
-	{
-		id: 'item-2',
-		title: 'Who can benefit from Efferd?',
-		content:
-			'Efferd is built for founders, product teams, and agencies that want to accelerate idea validation and delivery.',
-	},
-	{
-		id: 'item-3',
-		title: 'What features does Efferd include?',
-		content:
-			'Efferd offers a collaborative workspace where you can design and build beautiful web applications, with reusable UI blocks, deployment automation, and comprehensive analytics all in one place. With Efferd, you can streamline your team’s workflow and deliver high-quality websites quickly and efficiently.',
-	},
-	{
-		id: 'item-4',
-		title: 'Can I customize components in Efferd?',
-		content:
-			'Yes. Efferd offers editable design systems and code scaffolding so you can tailor blocks to your brand and workflow.',
-	},
-	{
-		id: 'item-5',
-		title: 'Does Efferd integrate with my existing tools?',
-		content:
-			'Efferd connects with popular source control, design tools, and cloud providers to fit into your current stack.',
-	},
-	{
-		id: 'item-6',
-		title: 'How do I get support while using Efferd?',
-		content:
-			'You can access detailed docs, community forums, and dedicated customer success channels for help at any time.',
-	},
-	{
-		id: 'item-7',
-		title: 'How do I get started with Efferd?',
-		content:
-			'You can access detailed docs, community forums, and dedicated customer success channels for help at any time.',
-	},
+function CreativePricing({
+    tag = "Simple Pricing",
+    title = "Make Short Videos That Pop",
+    description = "Edit, enhance, and go viral in minutes",
+    tiers,
+}: {
+    tag?: string;
+    title?: string;
+    description?: string;
+    tiers: PricingTier[];
+}) {
+    return (
+        <div className="w-full max-w-6xl mx-auto px-4">
+            <div className="text-center space-y-6 mb-16">
+                <div className="font-handwritten text-xl text-blue-500 rotate-[-1deg]">
+                    {tag}
+                </div>
+                <div className="relative">
+                    <h2 className="text-4xl md:text-5xl font-bold font-handwritten text-zinc-900 dark:text-white rotate-[-1deg]">
+                        {title}
+                        <div className="absolute -right-12 top-0 text-amber-500 rotate-12">
+                            ✨
+                        </div>
+                        <div className="absolute -left-8 bottom-0 text-blue-500 -rotate-12">
+                            ⭐️
+                        </div>
+                    </h2>
+                    <div
+                        className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-44 h-3 bg-blue-500/20 
+                        rotate-[-1deg] rounded-full blur-sm"
+                    />
+                </div>
+                <p className="font-handwritten text-xl text-zinc-600 dark:text-zinc-400 rotate-[-1deg]">
+                    {description}
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {tiers.map((tier, index) => (
+                    <div
+                        key={tier.name}
+                        className={cn(
+                            "relative group",
+                            "transition-all duration-300",
+                            index === 0 && "rotate-[-1deg]",
+                            index === 1 && "rotate-[1deg]",
+                            index === 2 && "rotate-[-2deg]"
+                        )}
+                    >
+                        <div
+                            className={cn(
+                                "absolute inset-0 bg-white dark:bg-zinc-900",
+                                "border-2 border-zinc-900 dark:border-white",
+                                "rounded-lg shadow-[4px_4px_0px_0px] shadow-zinc-900 dark:shadow-white",
+                                "transition-all duration-300",
+                                "group-hover:shadow-[8px_8px_0px_0px]",
+                                "group-hover:translate-x-[-4px]",
+                                "group-hover:translate-y-[-4px]"
+                            )}
+                        />
+
+                        <div className="relative p-6">
+                            {tier.popular && (
+                                <div
+                                    className="absolute -top-2 -right-2 bg-amber-400 text-zinc-900 
+                                    font-handwritten px-3 py-1 rounded-full rotate-12 text-sm border-2 border-zinc-900"
+                                >
+                                    Popular!
+                                </div>
+                            )}
+
+                            <div className="mb-6">
+                                <div
+                                    className={cn(
+                                        "w-12 h-12 rounded-full mb-4",
+                                        "flex items-center justify-center",
+                                        "border-2 border-zinc-900 dark:border-white",
+                                        `text-${tier.color}-500`
+                                    )}
+                                >
+                                    {tier.icon}
+                                </div>
+                                <h3 className="font-handwritten text-2xl text-zinc-900 dark:text-white">
+                                    {tier.name}
+                                </h3>
+                                <p className="font-handwritten text-zinc-600 dark:text-zinc-400">
+                                    {tier.description}
+                                </p>
+                            </div>
+
+                            {/* Price */}
+                            <div className="mb-6 font-handwritten">
+                                <span className="text-4xl font-bold text-zinc-900 dark:text-white">
+                                    ${tier.price}
+                                </span>
+                                <span className="text-zinc-600 dark:text-zinc-400">
+                                    /month
+                                </span>
+                            </div>
+
+                            <div className="space-y-3 mb-6">
+                                {tier.features.map((feature) => (
+                                    <div
+                                        key={feature}
+                                        className="flex items-center gap-3"
+                                    >
+                                        <div
+                                            className="w-5 h-5 rounded-full border-2 border-zinc-900 
+                                            dark:border-white flex items-center justify-center"
+                                        >
+                                            <Check className="w-3 h-3" />
+                                        </div>
+                                        <span className="font-handwritten text-lg text-zinc-900 dark:text-white">
+                                            {feature}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <Button
+                                className={cn(
+                                    "w-full h-12 font-handwritten text-lg relative",
+                                    "border-2 border-zinc-900 dark:border-white",
+                                    "transition-all duration-300",
+                                    "shadow-[4px_4px_0px_0px] shadow-zinc-900 dark:shadow-white",
+                                    "hover:shadow-[6px_6px_0px_0px]",
+                                    "hover:translate-x-[-2px] hover:translate-y-[-2px]",
+                                    tier.popular
+                                        ? [
+                                              "bg-amber-400 text-zinc-900",
+                                              "hover:bg-amber-300",
+                                              "active:bg-amber-400",
+                                              "dark:hover:bg-amber-300",
+                                              "dark:active:bg-amber-400",
+                                          ]
+                                        : [
+                                              "bg-zinc-50 dark:bg-zinc-800",
+                                              "text-zinc-900 dark:text-white",
+                                              "hover:bg-white dark:hover:bg-zinc-700",
+                                              "active:bg-zinc-50 dark:active:bg-zinc-800",
+                                          ]
+                                )}
+                            >
+                                Get Started
+                            </Button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <div className="absolute -z-10 inset-0 overflow-hidden">
+                <div className="absolute top-40 left-20 text-4xl rotate-12">
+                    ✎
+                </div>
+                <div className="absolute bottom-40 right-20 text-4xl -rotate-12">
+                    ✏️
+                </div>
+            </div>
+        </div>
+    );
+}
+
+
+export { CreativePricing, PricingTier }
+
+demo.tsx
+import { CreativePricing } from "@/components/ui/creative-pricing"
+import type { PricingTier } from "@/components/ui/creative-pricing"
+import { Button } from "@/components/ui/button"
+import { Check, Pencil, Star, Sparkles } from "lucide-react";
+
+
+
+const sampleTiers: PricingTier[] = [
+    {
+        name: "Creator",
+        icon: <Pencil className="w-6 h-6" />,
+        price: 29,
+        description: "Perfect for short video beginners",
+        color: "amber",
+        features: [
+            "60-second Video Export",
+            "10 Trending Templates",
+            "Auto Text-to-Speech",
+            "Basic Transitions",
+        ],
+    },
+    {
+        name: "Influencer",
+        icon: <Star className="w-6 h-6" />,
+        price: 79,
+        description: "For serious content creators",
+        color: "blue",
+        features: [
+            "3-minute Video Export",
+            "Voice Effects & Filters",
+            "Trending Sound Library",
+            "Auto Captions & Subtitles",
+        ],
+        popular: true,
+    },
+    {
+        name: "Pro Studio",
+        icon: <Sparkles className="w-6 h-6" />,
+        price: 149,
+        description: "For viral content masters",
+        color: "purple",
+        features: [
+            "Multi-clip Editing",
+            "Green Screen Effects",
+            "Viral Sound Detection",
+            "Engagement Analytics",
+        ],
+    },
 ];
 
 
-demo.tsx
-import { FaqsSection } from "@/components/ui/faqs-1";
-
-export default function DemoOne() {
-  return <FaqsSection />;
+function CreativePricingDemo() {
+    return <CreativePricing  tiers={sampleTiers} />
 }
+
+export { CreativePricingDemo }
+
 
 ```
 
 Copy-paste these files for dependencies:
 ```tsx
-shadcn/accordion
-"use client"
-
+shadcn/button
 import * as React from "react"
-import * as AccordionPrimitive from "@radix-ui/react-accordion"
-import { ChevronDown } from "lucide-react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-const Accordion = AccordionPrimitive.Root
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+)
 
-const AccordionItem = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
->(({ className, ...props }, ref) => (
-  <AccordionPrimitive.Item
-    ref={ref}
-    className={cn("border-b", className)}
-    {...props}
-  />
-))
-AccordionItem.displayName = "AccordionItem"
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+}
 
-const AccordionTrigger = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Header className="flex">
-    <AccordionPrimitive.Trigger
-      ref={ref}
-      className={cn(
-        "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-      <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
-    </AccordionPrimitive.Trigger>
-  </AccordionPrimitive.Header>
-))
-AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+Button.displayName = "Button"
 
-const AccordionContent = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Content
-    ref={ref}
-    className="overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
-    {...props}
-  >
-    <div className={cn("pb-4 pt-0", className)}>{children}</div>
-  </AccordionPrimitive.Content>
-))
-
-AccordionContent.displayName = AccordionPrimitive.Content.displayName
-
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
+export { Button, buttonVariants }
 
 ```
 
 Install NPM dependencies:
 ```bash
-lucide-react, @radix-ui/react-accordion
+lucide-react, @radix-ui/react-slot, class-variance-authority
 ```
 
-Extend existing Tailwind 4 index.css with this code (or if project uses Tailwind 3, extend tailwind.config.js or globals.css):
-```css
-@import "tailwindcss";
-@import "tw-animate-css";
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
 
-@theme inline {
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
-}
-
-
-@keyframes accordion-down {
-  from {
-    height: 0;
-  }
-  to {
-    height: var(--radix-accordion-content-height);
-  }
-}
-
-@keyframes accordion-up {
-  from {
-    height: var(--radix-accordion-content-height);
-  }
-  to {
-    height: 0;
-  }
-}
-```
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them

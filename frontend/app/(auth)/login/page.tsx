@@ -1,17 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { api } from "@/lib/api";
 import { storeUser, storeTokens, type User } from "@/lib/hooks";
 import { Brain, Eye, EyeOff, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CanvasRevealEffect } from "@/components/ui/sign-in-flow-1";
 
-interface LoginData { username: string; password: string; }
-interface TokenResponse { access: string; refresh: string; user: User; }
+interface LoginData {
+  username: string;
+  password: string;
+}
+interface TokenResponse {
+  access: string;
+  refresh: string;
+  user: User;
+}
+
+type Step = "credentials" | "success";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,6 +28,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPwd, setShowPwd] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [step, setStep] = useState<Step>("credentials");
+  const [initialCanvasVisible, setInitialCanvasVisible] = useState(true);
+  const [reverseCanvasVisible, setReverseCanvasVisible] = useState(false);
+  const pendingRole = useRef<string>("student");
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginData) => {
@@ -28,97 +41,219 @@ export default function LoginPage() {
     onSuccess: (data) => {
       storeTokens(data.access, data.refresh);
       if (data.user) storeUser(data.user);
-      const role = data.user?.role;
-      router.push(role === "instructor" ? "/dashboard/instructor" : "/dashboard/student");
+      pendingRole.current = data.user?.role ?? "student";
+
+      // Trigger canvas reverse animation
+      setReverseCanvasVisible(true);
+      setTimeout(() => setInitialCanvasVisible(false), 50);
+      setTimeout(() => setStep("success"), 1500);
+      setTimeout(() => {
+        router.push(
+          pendingRole.current === "instructor"
+            ? "/dashboard/instructor"
+            : "/dashboard/student"
+        );
+      }, 2800);
     },
     onError: () => setErrorMsg("Invalid username or password. Please try again."),
   });
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg("");
+    loginMutation.mutate({ username, password });
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[#0A0A0A] relative overflow-hidden">
-      {/* Subtle ambient light */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-white/5 rounded-full blur-[100px] pointer-events-none" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="w-full max-w-[420px] bg-[#1A1A1A] border border-white/30 rounded-2xl p-8 relative z-10 shadow-2xl"
-      >
-        <div className="flex flex-col items-center mb-8">
-          <Link href="/" className="w-12 h-12 rounded bg-white flex items-center justify-center mb-6">
-            <Brain className="w-7 h-7 text-[#0A0A0A]" />
-          </Link>
-          <h1 className="text-2xl font-bold tracking-tight text-white mb-2" style={{ letterSpacing: "-0.02em" }}>
-            Welcome back
-          </h1>
-          <p className="text-white/80 text-sm text-center">
-            Sign in to your QuizCraft AI account to continue.
-          </p>
-        </div>
-
-        <form onSubmit={(e) => { e.preventDefault(); setErrorMsg(""); loginMutation.mutate({ username, password }); }} className="space-y-5">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-white/80">Username</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              autoFocus
-              className="w-full px-4 py-3 bg-[#1A1A1A] border border-white/30 rounded-lg text-white text-sm outline-none transition-all placeholder:text-white/60 focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
-              placeholder="Enter your username"
+    <div className="flex w-full flex-col min-h-screen bg-black relative overflow-hidden">
+      {/* Canvas background layer */}
+      <div className="absolute inset-0 z-0">
+        {initialCanvasVisible && (
+          <div className="absolute inset-0">
+            <CanvasRevealEffect
+              animationSpeed={3}
+              containerClassName="bg-black"
+              colors={[[255, 255, 255], [255, 255, 255]]}
+              dotSize={6}
+              reverse={false}
             />
           </div>
-
-          <div className="space-y-2 relative">
-            <label className="text-sm font-medium text-white/80">Password</label>
-            <div className="relative">
-              <input
-                type={showPwd ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-[#1A1A1A] border border-white/30 rounded-lg text-white text-sm outline-none transition-all pr-12 placeholder:text-white/60 focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.1)]"
-                placeholder="Enter your password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPwd(!showPwd)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/80 transition-colors"
-              >
-                {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
+        )}
+        {reverseCanvasVisible && (
+          <div className="absolute inset-0">
+            <CanvasRevealEffect
+              animationSpeed={4}
+              containerClassName="bg-black"
+              colors={[[255, 255, 255], [255, 255, 255]]}
+              dotSize={6}
+              reverse={true}
+            />
           </div>
+        )}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.85)_0%,_transparent_100%)]" />
+        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-black to-transparent" />
+      </div>
 
-          {errorMsg && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              className="text-sm text-[#EF4444] bg-[#EF4444]/10 border border-[#EF4444]/20 rounded-lg p-3 text-center"
-            >
-              {errorMsg}
-            </motion.div>
-          )}
+      {/* Content layer */}
+      <div className="relative z-10 flex flex-col flex-1 items-center justify-center px-4">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 mb-12">
+          <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
+            <Brain className="w-5 h-5 text-black" />
+          </div>
+          <span className="text-white font-semibold tracking-tight">QuizCraft AI</span>
+        </Link>
 
-          <Button type="submit" className="w-full mt-2" disabled={loginMutation.isPending}>
-            {loginMutation.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Signing in...
-              </>
-            ) : "Sign In"}
-          </Button>
-        </form>
+        <div className="w-full max-w-sm">
+          <AnimatePresence mode="wait">
+            {step === "credentials" ? (
+              <motion.div
+                key="credentials"
+                initial={{ opacity: 0, x: -80 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -80 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="space-y-6 text-center"
+              >
+                <div className="space-y-1">
+                  <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight text-white">
+                    Welcome back
+                  </h1>
+                  <p className="text-lg text-white/50 font-light">
+                    Sign in to your account
+                  </p>
+                </div>
 
-        <div className="mt-8 text-center text-sm text-white/60">
-          Don't have an account?{" "}
-          <Link href="/register" className="text-white hover:underline underline-offset-4 transition-all">
-            Sign up
-          </Link>
+                <form onSubmit={handleSubmit} className="space-y-3 text-left">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-white/60 uppercase tracking-wider pl-1">
+                      Username
+                    </label>
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                      autoFocus
+                      placeholder="Enter your username"
+                      className="w-full backdrop-blur-sm text-white border border-white/15 bg-white/5 rounded-full py-3 px-5 focus:outline-none focus:border-white/40 placeholder:text-white/30 text-sm transition-colors"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-white/60 uppercase tracking-wider pl-1">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPwd ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        placeholder="Enter your password"
+                        className="w-full backdrop-blur-sm text-white border border-white/15 bg-white/5 rounded-full py-3 px-5 pr-12 focus:outline-none focus:border-white/40 placeholder:text-white/30 text-sm transition-colors"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPwd(!showPwd)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition-colors"
+                        tabIndex={-1}
+                      >
+                        {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {errorMsg && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-sm text-red-400 text-center pt-1"
+                    >
+                      {errorMsg}
+                    </motion.p>
+                  )}
+
+                  <div className="pt-2">
+                    <motion.button
+                      type="submit"
+                      disabled={loginMutation.isPending}
+                      whileHover={{ scale: loginMutation.isPending ? 1 : 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full rounded-full bg-white text-black font-semibold py-3 hover:bg-white/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {loginMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Signing in...
+                        </>
+                      ) : (
+                        "Sign In"
+                      )}
+                    </motion.button>
+                  </div>
+                </form>
+
+                <p className="text-sm text-white/40">
+                  Don&apos;t have an account?{" "}
+                  <Link
+                    href="/register"
+                    className="text-white/70 hover:text-white underline underline-offset-4 transition-colors"
+                  >
+                    Sign up
+                  </Link>
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}
+                className="space-y-6 text-center"
+              >
+                <div className="space-y-1">
+                  <h1 className="text-[2.5rem] font-bold leading-[1.1] tracking-tight text-white">
+                    You&apos;re in!
+                  </h1>
+                  <p className="text-lg text-white/50 font-light">Welcome back</p>
+                </div>
+
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className="py-8"
+                >
+                  <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-white to-white/70 flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-8 w-8 text-black"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                </motion.div>
+
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                  className="text-white/40 text-sm"
+                >
+                  Redirecting to your dashboard…
+                </motion.p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

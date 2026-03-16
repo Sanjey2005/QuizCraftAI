@@ -15,7 +15,12 @@
       "Bash(npm run:*)",
       "Bash(find:*)",
       "Bash(npm install canvas-confetti)",
-      "Bash(npm install --save-dev @types/canvas-confetti)"
+      "Bash(npm install --save-dev @types/canvas-confetti)",
+      "Bash(npm install dotted-map)",
+      "Bash(npm install @splinetool/react-spline @splinetool/runtime --legacy-peer-deps)",
+      "Bash(npm install three @react-three/fiber)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm install --save-dev @types/three)"
     ]
   }
 }
